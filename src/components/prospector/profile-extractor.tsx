@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState } from "react";
@@ -33,7 +32,7 @@ export function ProfileExtractor() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <Card className="md:col-span-1 border-none shadow-sm h-fit">
+      <Card className="md:col-span-1 border-none shadow-xl bg-white h-fit rounded-[2rem]">
         <CardHeader>
           <CardTitle className="text-lg">Analizar URL</CardTitle>
           <CardDescription>Escanea un sitio web para extraer datos públicos.</CardDescription>
@@ -46,12 +45,12 @@ export function ProfileExtractor() {
                 placeholder="https://ejemplo.com" 
                 value={url} 
                 onChange={(e) => setUrl(e.target.value)}
-                className="bg-muted/30 focus-visible:ring-primary"
+                className="bg-secondary/50 border-border focus-visible:ring-primary h-12 rounded-xl transition-colors"
               />
             </div>
           </div>
           <Button 
-            className="w-full bg-primary text-primary-foreground" 
+            className="w-full bg-primary text-primary-foreground h-12 rounded-xl shadow-lg glow-primary font-bold" 
             onClick={handleExtract}
             disabled={isScanning || !url}
           >
@@ -64,7 +63,7 @@ export function ProfileExtractor() {
         </CardContent>
       </Card>
 
-      <Card className="md:col-span-2 border-none shadow-sm min-h-[400px] flex flex-col items-center justify-center bg-card">
+      <Card className="md:col-span-2 border-none shadow-xl min-h-[400px] flex flex-col items-center justify-center bg-white rounded-[2rem] overflow-hidden">
         {!result && !isScanning && (
           <div className="text-center p-8">
             <div className="bg-muted/50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -89,7 +88,7 @@ export function ProfileExtractor() {
 
         {result && !isScanning && (
           <div className="w-full p-6 animate-fade-in space-y-6">
-            <div className="flex items-center justify-between border-b pb-4">
+            <div className="flex items-center justify-between border-b border-border pb-4">
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-xl bg-primary flex items-center justify-center text-primary-foreground text-2xl font-bold">
                   {result.businessName.charAt(0)}
@@ -99,36 +98,36 @@ export function ProfileExtractor() {
                   <Badge variant="outline" className="text-primary border-primary/20 bg-primary/5">{result.industry}</Badge>
                 </div>
               </div>
-              <Button size="sm" variant="outline" className="border-accent text-accent-foreground hover:bg-accent/10">Guardar como Lead</Button>
+              <Button size="sm" variant="outline" className="border-accent text-accent hover:bg-accent/10 h-10 px-6 rounded-xl font-bold">Guardar como Lead</Button>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="p-4 rounded-lg bg-muted/20 flex items-center gap-3">
-                <div className="bg-white p-2 rounded-md shadow-sm text-blue-500"><User className="w-4 h-4" /></div>
+              <div className="p-4 rounded-xl bg-secondary/30 border border-border flex items-center gap-3">
+                <div className="bg-white p-2 rounded-md shadow-sm text-blue-500 border border-border"><User className="w-4 h-4" /></div>
                 <div>
                   <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">Propietario / CEO</p>
                   <p className="text-sm font-semibold">{result.owner}</p>
                 </div>
               </div>
-              <div className="p-4 rounded-lg bg-muted/20 flex items-center gap-3">
-                <div className="bg-white p-2 rounded-md shadow-sm text-red-500"><Mail className="w-4 h-4" /></div>
+              <div className="p-4 rounded-xl bg-secondary/30 border border-border flex items-center gap-3">
+                <div className="bg-white p-2 rounded-md shadow-sm text-red-500 border border-border"><Mail className="w-4 h-4" /></div>
                 <div>
                   <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">Email Corporativo</p>
                   <p className="text-sm font-semibold">{result.email}</p>
                 </div>
               </div>
-              <div className="p-4 rounded-lg bg-muted/20 flex items-center gap-3">
-                <div className="bg-white p-2 rounded-md shadow-sm text-green-500"><Phone className="w-4 h-4" /></div>
+              <div className="p-4 rounded-xl bg-secondary/30 border border-border flex items-center gap-3">
+                <div className="bg-white p-2 rounded-md shadow-sm text-green-500 border border-border"><Phone className="w-4 h-4" /></div>
                 <div>
                   <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">Teléfono</p>
                   <p className="text-sm font-semibold">{result.phone}</p>
                 </div>
               </div>
-              <div className="p-4 rounded-lg bg-muted/20 flex items-center gap-3">
-                <div className="bg-white p-2 rounded-md shadow-sm text-purple-500"><Share2 className="w-4 h-4" /></div>
+              <div className="p-4 rounded-xl bg-secondary/30 border border-border flex items-center gap-3">
+                <div className="bg-white p-2 rounded-md shadow-sm text-purple-500 border border-border"><Share2 className="w-4 h-4" /></div>
                 <div className="flex flex-wrap gap-1">
                   {result.social.map((s: string) => (
-                    <Badge key={s} variant="secondary" className="text-[9px] h-4">{s}</Badge>
+                    <Badge key={s} variant="secondary" className="text-[9px] h-4 bg-white border-border">{s}</Badge>
                   ))}
                 </div>
               </div>

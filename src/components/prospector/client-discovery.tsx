@@ -63,7 +63,7 @@ export function ClientDiscovery() {
 
   return (
     <div className="space-y-8">
-      <Card className="glass-card border-none shadow-2xl overflow-hidden">
+      <Card className="glass-card border-none shadow-xl overflow-hidden bg-white">
         <div className="h-1 bg-gradient-to-r from-primary to-accent" />
         <CardContent className="pt-8">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
@@ -75,7 +75,7 @@ export function ClientDiscovery() {
                 value={params.sector}
                 onChange={(e) => setParams({...params, sector: e.target.value})}
                 placeholder="Ej: Inmobiliarias, Dentistas..." 
-                className="bg-white/5 border-white/10 h-12 text-white" 
+                className="bg-secondary/50 border-border h-12 text-foreground focus:ring-primary transition-colors" 
               />
             </div>
             <div className="md:col-span-4 space-y-2">
@@ -86,7 +86,7 @@ export function ClientDiscovery() {
                 value={params.location}
                 onChange={(e) => setParams({...params, location: e.target.value})}
                 placeholder="Ciudad o Barrio" 
-                className="bg-white/5 border-white/10 h-12 text-white" 
+                className="bg-secondary/50 border-border h-12 text-foreground focus:ring-primary transition-colors" 
               />
             </div>
             <div className="md:col-span-3">
@@ -111,24 +111,24 @@ export function ClientDiscovery() {
                 <Sparkles className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-2">Análisis de Mercado AI</h4>
+                <h4 className="text-sm font-bold text-foreground uppercase tracking-wider mb-2">Análisis de Mercado AI</h4>
                 <p className="text-muted-foreground leading-relaxed text-sm italic">"{results.marketOverview}"</p>
               </div>
             </div>
           </Card>
 
-          <Card className="glass-card border-none shadow-2xl overflow-hidden rounded-3xl">
-            <CardHeader className="flex flex-row items-center justify-between border-b border-white/5 bg-white/5 p-6">
+          <Card className="glass-card border-none shadow-xl overflow-hidden rounded-3xl bg-white">
+            <CardHeader className="flex flex-row items-center justify-between border-b border-border bg-muted/20 p-6">
               <div>
-                <CardTitle className="text-xl font-headline font-bold text-white">Prospectos Identificados</CardTitle>
-                <CardDescription className="text-muted-foreground/60 text-xs">Inteligencia competitiva generada por {profile?.aiSettings?.modelId?.split('/').pop()}.</CardDescription>
+                <CardTitle className="text-xl font-headline font-bold text-foreground">Prospectos Identificados</CardTitle>
+                <CardDescription className="text-muted-foreground text-xs">Inteligencia competitiva generada por {profile?.aiSettings?.modelId?.split('/').pop()}.</CardDescription>
               </div>
-              <Button variant="outline" size="sm" className="bg-white/5 border-white/10 text-white text-[10px] font-bold uppercase tracking-widest"><Download className="w-3 h-3 mr-2" /> Exportar</Button>
+              <Button variant="outline" size="sm" className="bg-white border-border text-foreground text-[10px] font-bold uppercase tracking-widest hover:bg-muted"><Download className="w-3 h-3 mr-2" /> Exportar</Button>
             </CardHeader>
             <CardContent className="p-0">
               <Table>
-                <TableHeader className="bg-white/5">
-                  <TableRow className="border-white/5">
+                <TableHeader className="bg-muted/10">
+                  <TableRow className="border-border">
                     <TableHead className="text-[10px] font-bold text-muted-foreground uppercase py-4">Negocio</TableHead>
                     <TableHead className="text-[10px] font-bold text-muted-foreground uppercase">Zona</TableHead>
                     <TableHead className="text-[10px] font-bold text-muted-foreground uppercase">Reputación</TableHead>
@@ -138,16 +138,16 @@ export function ClientDiscovery() {
                 </TableHeader>
                 <TableBody>
                   {results.leads.map((lead, index) => (
-                    <TableRow key={index} className="border-white/5 hover:bg-white/5 transition-colors group">
+                    <TableRow key={index} className="border-border hover:bg-muted/30 transition-colors group">
                       <TableCell className="py-4">
-                        <div className="font-bold text-white group-hover:text-primary transition-colors">{lead.name}</div>
+                        <div className="font-bold text-foreground group-hover:text-primary transition-colors">{lead.name}</div>
                         <div className="text-[10px] text-muted-foreground uppercase">{lead.sector}</div>
                       </TableCell>
                       <TableCell className="text-muted-foreground text-sm">{lead.location}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
                           <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                          <span className="text-sm font-bold text-white">{lead.rating}</span>
+                          <span className="text-sm font-bold text-foreground">{lead.rating}</span>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -156,7 +156,7 @@ export function ClientDiscovery() {
                           className={`text-[9px] font-bold uppercase tracking-tighter ${
                             lead.status === "Lead Caliente" 
                               ? "border-accent text-accent-foreground bg-accent/10" 
-                              : "border-white/10 text-muted-foreground"
+                              : "border-border text-muted-foreground bg-muted/50"
                           }`}
                         >
                           {lead.status}
@@ -170,11 +170,11 @@ export function ClientDiscovery() {
                                 <Info className="w-4 h-4" />
                               </Button>
                             </TooltipTrigger>
-                            <TooltipContent className="bg-popover border-white/10 p-4 max-w-[250px] rounded-xl shadow-2xl">
+                            <TooltipContent className="bg-white border-border p-4 max-w-[250px] rounded-xl shadow-2xl">
                               <div className="space-y-2">
                                 <p className="text-xs font-bold text-primary uppercase">Oportunidad</p>
-                                <p className="text-xs leading-relaxed text-white">{lead.description}</p>
-                                <div className="pt-2 border-t border-white/5">
+                                <p className="text-xs leading-relaxed text-foreground">{lead.description}</p>
+                                <div className="pt-2 border-t border-border">
                                   <p className="text-[10px] font-bold text-accent uppercase">Acción Sugerida</p>
                                   <p className="text-[10px] italic text-muted-foreground">{lead.suggestedAction}</p>
                                 </div>

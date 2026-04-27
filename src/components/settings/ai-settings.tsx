@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -61,11 +60,11 @@ export function AISettings() {
   return (
     <div className="max-w-5xl space-y-8 pb-20">
       <div className="flex flex-col gap-2">
-        <h2 className="text-3xl font-headline font-bold text-white">Configuración de Inteligencia</h2>
+        <h2 className="text-3xl font-headline font-bold text-foreground">Configuración de Inteligencia</h2>
         <p className="text-muted-foreground">Gestiona tus API Keys y modelos para un control total.</p>
       </div>
 
-      <Alert className="bg-primary/10 border-primary/20 text-white">
+      <Alert className="bg-primary/10 border-primary/20 text-primary">
         <ShieldCheck className="h-4 w-4 text-primary" />
         <AlertTitle className="font-bold">Privacidad de Datos</AlertTitle>
         <AlertDescription className="text-xs opacity-70">
@@ -75,9 +74,9 @@ export function AISettings() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-8 space-y-6">
-          <Card className="glass-card border-none shadow-xl">
-            <CardHeader className="bg-white/5">
-              <CardTitle className="text-lg flex items-center gap-2 text-white">
+          <Card className="glass-card border-none shadow-xl bg-white rounded-[2rem]">
+            <CardHeader className="bg-muted/30 border-b border-border">
+              <CardTitle className="text-lg flex items-center gap-2 text-foreground">
                 <BrainCircuit className="w-5 h-5 text-primary" /> Proveedor Google AI
               </CardTitle>
               <CardDescription>Introduce tu clave de Gemini para activar las funciones estratégicas.</CardDescription>
@@ -92,7 +91,7 @@ export function AISettings() {
                   value={settings.apiKey}
                   onChange={(e) => setSettings({...settings, apiKey: e.target.value})}
                   placeholder="AIzaSy..."
-                  className="bg-white/5 border-white/10 h-12 text-white"
+                  className="bg-secondary/50 border-border h-12 text-foreground focus:ring-primary transition-colors rounded-xl"
                 />
                 <p className="text-[10px] text-muted-foreground">Obtén tu clave gratuita en Google AI Studio.</p>
               </div>
@@ -105,10 +104,10 @@ export function AISettings() {
                   value={settings.modelId} 
                   onValueChange={(val) => setSettings({...settings, modelId: val})}
                 >
-                  <SelectTrigger className="bg-white/5 border-white/10 h-14 text-white">
+                  <SelectTrigger className="bg-secondary/50 border-border h-14 text-foreground rounded-xl transition-colors">
                     <SelectValue placeholder="Selecciona un modelo" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#02040a] border-white/10 text-white">
+                  <SelectContent className="bg-white border-border text-foreground">
                     <SelectItem value="googleai/gemini-1.5-flash">Gemini 1.5 Flash (Ultrarrápido)</SelectItem>
                     <SelectItem value="googleai/gemini-1.5-pro">Gemini 1.5 Pro (Estratégico)</SelectItem>
                     <SelectItem value="googleai/gemini-2.0-flash-exp">Gemini 2.0 Flash (Experimental)</SelectItem>
@@ -116,9 +115,9 @@ export function AISettings() {
                 </Select>
               </div>
             </CardContent>
-            <CardFooter className="border-t border-white/5 pt-6">
+            <CardFooter className="border-t border-border pt-6">
               <Button 
-                className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-12 shadow-lg glow-primary"
+                className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-12 shadow-lg glow-primary rounded-xl"
                 onClick={handleSave}
                 disabled={loading}
               >
@@ -130,11 +129,11 @@ export function AISettings() {
         </div>
 
         <div className="lg:col-span-4">
-          <Card className="glass-card border-none p-6 space-y-4">
-            <div className="bg-primary/20 w-12 h-12 rounded-2xl flex items-center justify-center text-primary">
+          <Card className="glass-card border-none p-6 space-y-4 bg-white shadow-xl rounded-[2rem]">
+            <div className="bg-primary/10 w-12 h-12 rounded-2xl flex items-center justify-center text-primary border border-primary/20">
               <Info className="w-6 h-6" />
             </div>
-            <h4 className="font-headline font-bold text-white text-lg">¿Por qué usar tu API Key?</h4>
+            <h4 className="font-headline font-bold text-foreground text-lg">¿Por qué usar tu API Key?</h4>
             <p className="text-xs text-muted-foreground leading-relaxed">
               MarketScout Pro utiliza el modelo "Bring Your Own Key". Esto te garantiza privacidad total y el uso de tus propias cuotas de Google AI Studio, permitiéndote generar planes complejos sin límites impuestos por la plataforma.
             </p>

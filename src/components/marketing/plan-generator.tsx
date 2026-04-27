@@ -62,15 +62,30 @@ export function PlanGenerator() {
         <CardContent className="p-10 pt-0 space-y-6">
           <div className="space-y-2">
             <label className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest px-1">Negocio</label>
-            <Input value={formData.businessName} onChange={(e) => setFormData({...formData, businessName: e.target.value})} className="bg-muted/30 border-none h-12 rounded-xl focus:ring-primary" />
+            <Input 
+              value={formData.businessName} 
+              onChange={(e) => setFormData({...formData, businessName: e.target.value})} 
+              className="bg-secondary/50 border-border h-12 rounded-xl focus:ring-primary transition-colors" 
+              placeholder="Nombre de la empresa"
+            />
           </div>
           <div className="space-y-2">
             <label className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest px-1">Industria</label>
-            <Input value={formData.industry} onChange={(e) => setFormData({...formData, industry: e.target.value})} className="bg-muted/30 border-none h-12 rounded-xl" />
+            <Input 
+              value={formData.industry} 
+              onChange={(e) => setFormData({...formData, industry: e.target.value})} 
+              className="bg-secondary/50 border-border h-12 rounded-xl focus:ring-primary transition-colors" 
+              placeholder="Sector industrial"
+            />
           </div>
           <div className="space-y-2">
             <label className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest px-1">Objetivos</label>
-            <Textarea value={formData.objectives} onChange={(e) => setFormData({...formData, objectives: e.target.value})} className="min-h-[100px] bg-muted/30 border-none rounded-xl p-4 focus:ring-primary" />
+            <Textarea 
+              value={formData.objectives} 
+              onChange={(e) => setFormData({...formData, objectives: e.target.value})} 
+              className="min-h-[100px] bg-secondary/50 border-border rounded-xl p-4 focus:ring-primary transition-colors" 
+              placeholder="¿Qué quieres conseguir?"
+            />
           </div>
 
           <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10 flex items-center gap-4">
