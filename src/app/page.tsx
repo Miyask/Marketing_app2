@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -18,7 +17,9 @@ import {
   Target,
   LogOut,
   Sparkles,
-  BookOpen
+  BookOpen,
+  ChevronRight,
+  TrendingUp
 } from "lucide-react";
 import {
   Sidebar,
@@ -66,32 +67,40 @@ export default function MarketScoutDashboard() {
 
   return (
     <SidebarProvider defaultOpen={true}>
-      <div className="flex min-h-screen bg-background w-full overflow-hidden">
-        <Sidebar variant="inset" className="border-r border-sidebar-border shadow-sm">
-          <SidebarHeader className="p-6">
-            <div className="flex items-center gap-3">
-              <div className="bg-primary p-2 rounded-xl text-primary-foreground shadow-lg shadow-primary/20">
+      <div className="flex min-h-screen w-full overflow-hidden bg-background">
+        <Sidebar variant="inset" className="border-r border-white/5 shadow-2xl">
+          <SidebarHeader className="p-8">
+            <div className="flex items-center gap-4">
+              <div className="bg-primary p-2.5 rounded-2xl text-primary-foreground shadow-lg glow-primary animate-float">
                 <Target className="w-6 h-6" />
               </div>
               <div>
-                <h1 className="text-xl font-headline font-bold text-primary">MarketScout</h1>
-                <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">Strategic AI</p>
+                <h1 className="text-xl font-headline font-bold text-white tracking-tight">MarketScout</h1>
+                <Badge variant="outline" className="text-[9px] uppercase tracking-tighter border-primary/30 text-primary">Pro Strategist</Badge>
               </div>
             </div>
           </SidebarHeader>
-          <SidebarContent>
+          <SidebarContent className="px-4">
             <SidebarGroup>
-              <SidebarGroupLabel>Marketing Estratégico</SidebarGroupLabel>
+              <SidebarGroupLabel className="text-muted-foreground/50 px-4">CORE STRATEGY</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
-                    <SidebarMenuButton isActive={activeTab === "strategy"} onClick={() => setActiveTab("strategy")}>
-                      <Sparkles className="w-4 h-4 text-accent" />
-                      <span className="font-semibold">Plan Maestro AI</span>
+                    <SidebarMenuButton 
+                      isActive={activeTab === "strategy"} 
+                      onClick={() => setActiveTab("strategy")}
+                      className="h-11 rounded-xl data-[active=true]:bg-primary data-[active=true]:text-white transition-all duration-300"
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      <span className="font-medium">Plan Maestro AI</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
-                    <SidebarMenuButton isActive={activeTab === "generator"} onClick={() => setActiveTab("generator")}>
+                    <SidebarMenuButton 
+                      isActive={activeTab === "generator"} 
+                      onClick={() => setActiveTab("generator")}
+                      className="h-11 rounded-xl data-[active=true]:bg-primary data-[active=true]:text-white transition-all duration-300"
+                    >
                       <Zap className="w-4 h-4" />
                       <span>Activos Creativos</span>
                     </SidebarMenuButton>
@@ -101,17 +110,17 @@ export default function MarketScoutDashboard() {
             </SidebarGroup>
 
             <SidebarGroup>
-              <SidebarGroupLabel>Gestión & ROI</SidebarGroupLabel>
+              <SidebarGroupLabel className="text-muted-foreground/50 px-4">PERFORMANCE</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
-                    <SidebarMenuButton isActive={activeTab === "leads"} onClick={() => setActiveTab("leads")}>
+                    <SidebarMenuButton isActive={activeTab === "leads"} onClick={() => setActiveTab("leads")} className="h-11 rounded-xl">
                       <Database className="w-4 h-4" />
-                      <span>Leads & Campañas</span>
+                      <span>CRM & Campañas</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
-                    <SidebarMenuButton isActive={activeTab === "roi"} onClick={() => setActiveTab("roi")}>
+                    <SidebarMenuButton isActive={activeTab === "roi"} onClick={() => setActiveTab("roi")} className="h-11 rounded-xl">
                       <BarChart3 className="w-4 h-4" />
                       <span>Predicción ROI</span>
                     </SidebarMenuButton>
@@ -119,100 +128,93 @@ export default function MarketScoutDashboard() {
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
-
-            <SidebarGroup>
-              <SidebarGroupLabel>Herramientas de Apoyo</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton isActive={activeTab === "extractor"} onClick={() => setActiveTab("extractor")}>
-                      <Globe className="w-4 h-4" />
-                      <span>Análisis de URL</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
           </SidebarContent>
-          <SidebarFooter className="p-4 border-t border-sidebar-border bg-sidebar-accent/30">
-            <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-sidebar-accent transition-colors">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
-                {user?.email?.[0].toUpperCase() || "U"}
+          <SidebarFooter className="p-6">
+            <div className="glass-card p-4 rounded-2xl space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold border border-primary/30">
+                  {user?.email?.[0].toUpperCase() || "U"}
+                </div>
+                <div className="flex-1 overflow-hidden">
+                  <p className="text-sm font-bold truncate text-white">{user?.displayName || "Usuario Pro"}</p>
+                  <button onClick={handleSignOut} className="text-[10px] text-destructive flex items-center gap-1 hover:underline">
+                    <LogOut className="w-2.5 h-2.5" /> Desconectar
+                  </button>
+                </div>
               </div>
-              <div className="flex-1 overflow-hidden">
-                <p className="text-sm font-semibold truncate">{user?.displayName || "Usuario"}</p>
-                <button onClick={handleSignOut} className="text-[10px] text-destructive flex items-center gap-1 hover:underline">
-                  <LogOut className="w-2.5 h-2.5" /> Cerrar Sesión
-                </button>
-              </div>
-              <Settings className="w-4 h-4 text-muted-foreground" />
+              <Button variant="outline" size="sm" className="w-full h-8 text-[10px] border-white/10 hover:bg-white/5">
+                <Settings className="w-3 h-3 mr-1" /> CONFIGURACIÓN
+              </Button>
             </div>
           </SidebarFooter>
         </Sidebar>
 
-        <SidebarInset className="flex-1 overflow-auto">
-          <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background/80 px-6 backdrop-blur-md">
+        <SidebarInset className="flex-1 overflow-auto bg-transparent">
+          <header className="sticky top-0 z-30 flex h-20 items-center gap-4 px-8 border-b border-white/5 bg-background/50 backdrop-blur-xl">
             <SidebarTrigger />
             <div className="flex-1" />
-            <div className="flex items-center gap-4">
-              <Button variant="outline" size="sm" className="hidden sm:flex border-primary/20 hover:border-primary/50 text-primary">
-                <Rocket className="mr-2 h-4 w-4" /> Pro Plan
+            <div className="flex items-center gap-6">
+              <div className="hidden lg:flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs font-bold">
+                <TrendingUp className="w-3 h-3" /> SISTEMA OPERATIVO
+              </div>
+              <Button size="sm" className="bg-primary hover:bg-primary/90 text-white font-bold rounded-full px-6 glow-primary">
+                <Rocket className="mr-2 h-4 w-4" /> SUBIR A ELITE
               </Button>
             </div>
           </header>
 
-          <main className="p-6 max-w-7xl mx-auto w-full animate-fade-in">
-            {activeTab === "strategy" && (
-              <div className="space-y-6">
-                <div className="flex flex-col gap-2">
-                  <h2 className="text-3xl font-headline font-bold text-primary flex items-center gap-2">
-                    <BookOpen className="w-8 h-8" /> Generador de Planes de Marketing
-                  </h2>
-                  <p className="text-muted-foreground">Crea una hoja de ruta estratégica para cualquier negocio en segundos.</p>
+          <main className="p-8 max-w-7xl mx-auto w-full">
+            <div className="animate-fade-in space-y-12">
+              {activeTab === "strategy" && (
+                <div className="space-y-8">
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-center gap-2 text-primary font-bold text-sm tracking-widest uppercase">
+                      <Sparkles className="w-4 h-4" /> Inteligencia Estratégica
+                    </div>
+                    <h2 className="text-5xl font-headline font-bold text-white tracking-tighter">
+                      Plan Maestro <span className="text-primary italic">AI</span>
+                    </h2>
+                    <p className="text-muted-foreground text-lg max-w-2xl leading-relaxed">
+                      Transformamos tu visión de negocio en una hoja de ruta accionable con precisión algorítmica.
+                    </p>
+                  </div>
+                  <PlanGenerator />
                 </div>
-                <PlanGenerator />
-              </div>
-            )}
+              )}
 
-            {activeTab === "generator" && (
-              <div className="space-y-6">
-                <div className="flex flex-col gap-2">
-                  <h2 className="text-3xl font-headline font-bold text-primary">Generador de Activos</h2>
-                  <p className="text-muted-foreground">Slogans, conceptos de logo y estructuras de folletos.</p>
+              {activeTab === "generator" && (
+                <div className="space-y-8">
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-center gap-2 text-accent font-bold text-sm tracking-widest uppercase">
+                      <Zap className="w-4 h-4" /> Laboratorio Creativo
+                    </div>
+                    <h2 className="text-5xl font-headline font-bold text-white">Generador de Activos</h2>
+                  </div>
+                  <AssetGenerator />
                 </div>
-                <AssetGenerator />
-              </div>
-            )}
+              )}
 
-            {activeTab === "leads" && (
-              <div className="space-y-6">
-                <div className="flex flex-col gap-2">
-                  <h2 className="text-3xl font-headline font-bold text-primary">Gestión de Leads</h2>
-                  <p className="text-muted-foreground">Tus prospectos detectados y su estatus comercial.</p>
+              {activeTab === "leads" && (
+                <div className="space-y-8">
+                  <h2 className="text-5xl font-headline font-bold text-white">Gestión de Leads</h2>
+                  <LeadList />
                 </div>
-                <LeadList />
-              </div>
-            )}
+              )}
 
-            {activeTab === "roi" && (
-              <div className="space-y-6">
-                <div className="flex flex-col gap-2">
-                  <h2 className="text-3xl font-headline font-bold text-primary">Predicción de Retorno</h2>
-                  <p className="text-muted-foreground">Calculadora de ROI basada en inversión y CPA.</p>
+              {activeTab === "roi" && (
+                <div className="space-y-8">
+                  <h2 className="text-5xl font-headline font-bold text-white tracking-tighter">Simulador de <span className="text-primary">Retorno</span></h2>
+                  <RoiCalculator />
                 </div>
-                <RoiCalculator />
-              </div>
-            )}
+              )}
 
-            {activeTab === "extractor" && (
-              <div className="space-y-6">
-                <div className="flex flex-col gap-2">
-                  <h2 className="text-3xl font-headline font-bold text-primary">Extractor de Perfiles</h2>
-                  <p className="text-muted-foreground">Análisis rápido de URLs para identificar contactos.</p>
+              {activeTab === "extractor" && (
+                <div className="space-y-8">
+                  <h2 className="text-5xl font-headline font-bold text-white">Análisis de Mercado</h2>
+                  <ProfileExtractor />
                 </div>
-                <ProfileExtractor />
-              </div>
-            )}
+              )}
+            </div>
           </main>
         </SidebarInset>
       </div>
