@@ -23,7 +23,7 @@
     --border: 20 10% 90%;
     --input: 20 10% 90%;
     --ring: 24 95% 53%;
-    --radius: 1.25rem;
+    --radius: 1.5rem;
     --sidebar-background: 30 20% 97%;
     --sidebar-foreground: 20 15% 25%;
     --sidebar-primary: 24 95% 53%;
@@ -42,8 +42,8 @@
   body {
     @apply bg-background text-foreground;
     background-image: 
-      radial-gradient(at 0% 0%, hsla(24, 95%, 53%, 0.05) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, hsla(38, 90%, 55%, 0.05) 0px, transparent 50%);
+      radial-gradient(at 0% 0%, hsla(24, 95%, 53%, 0.03) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, hsla(38, 90%, 55%, 0.03) 0px, transparent 50%);
     background-attachment: fixed;
   }
   h1, h2, h3, h4, h5, h6 {
@@ -52,27 +52,32 @@
 }
 
 .glass-card {
-  @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-[0_8px_30px_rgb(0,0,0,0.04)];
+  @apply bg-white/80 backdrop-blur-xl border border-white/40 shadow-[0_20px_50px_rgba(0,0,0,0.04)];
 }
 
 .glow-primary {
-  box-shadow: 0 10px 30px -10px hsla(24, 95%, 53%, 0.3);
+  box-shadow: 0 10px 40px -10px hsla(24, 95%, 53%, 0.4);
 }
 
 .glow-accent {
-  box-shadow: 0 10px 30px -10px hsla(38, 90%, 55%, 0.2);
+  box-shadow: 0 10px 40px -10px hsla(38, 90%, 55%, 0.3);
+}
+
+.card-elevated {
+  @apply bg-white shadow-[0_10px_30px_-5px_rgba(0,0,0,0.03)] border-none;
 }
 
 @keyframes float {
   0% { transform: translateY(0px); }
-  50% { transform: translateY(-8px); }
+  50% { transform: translateY(-10px); }
   100% { transform: translateY(0px); }
 }
 
 .animate-float {
-  animation: float 5s ease-in-out infinite;
+  animation: float 6s ease-in-out infinite;
 }
 
-.transition-slow {
-  @apply transition-all duration-500 ease-in-out;
+.transition-premium {
+  @apply transition-all duration-300;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
