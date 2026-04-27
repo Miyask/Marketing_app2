@@ -1,0 +1,158 @@
+/**
+ * MarketScout Pro - Firestore Security Rules
+ * 
+ * CORE PHILOSOPHY:
+ * This ruleset enforces a strict User-Ownership model. The application is designed
+ * around a "Private-by-Default" posture where users can only access data they
+ * explicitly own or created.
+ * 
+ * DATA STRUCTURE:
+ * The data is organized hierarchically. Every user-related document is nested 
+ * under a top-level /users/{userId} document. This creates a clear path-based 
+ * security perimeter. 
+ * 
+ * KEY SECURITY DECISIONS:
+ * - Path-Based Authorization: We rely on the {userId} wildcard in the path to
+ *   immediately identify the intended owner of the data.
+ * - Authorization Independence: To ensure rules are fast and don't require 
+ *   additional database lookups (get() calls), ownership fields (userId) and 
+ *   document identifiers (id) are denormalized (copied) into every document.
+ * - Relational Integrity: Rules strictly verify that internal fields (like 
+ *   request.resource.data.userId) match the actual path to prevent data 
+ *   hijacking or orphan documents.
+ * 
+ * DENORMALIZATION FOR AUTHORIZATION:
+ * - Documents contain a 'userId' field matching the owner's UID.
+ * - Documents contain an 'id' field matching their document ID.
+ * This allows simple checks like `isOwner(userId)` without extra reads.
+ */
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --- Helper Functions ---
+
+    /**
+     * @description Checks if the request is coming from an authenticated user.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * @description Basic ownership check comparing the path wildcard to the auth UID.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * @description Verifies ownership and ensures the document exists for state-changing operations.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    /**
+     * @description Validates relational integrity: internal data must match the path's owner.
+     */
+    function isValidOwnerLink(userId) {
+      return request.resource.data.userId == userId;
+    }
+
+    /**
+     * @description Ensures the document ID field matches the actual document name.
+     */
+    function isValidDocId(docId) {
+      return request.resource.data.id == docId;
+    }
+
+    // --- Collection Rules ---
+
+    /**
+     * @description Individual User Profiles. Users can only see and manage their own profile.
+     * @path /users/{userId}
+     * @allow (get) If auth.uid is 'user_123' and path is '/users/user_123'.
+     * @deny (list) If trying to list all users.
+     * @principle Self-Creation and ownership via ID matching.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false; // User listing is strictly prohibited for privacy.
+      allow create: if isOwner(userId) && isValidDocId(userId);
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(userId);
+
+      /**
+       * @description Business Profiles owned by the user.
+       * @path /users/{userId}/businessProfiles/{businessProfileId}
+       * @allow (create) If auth.uid matches path userId and data contains matching userId.
+       * @deny (get) If auth.uid 'user_A' tries to read from path 'user_B'.
+       * @principle Path-based ownership and relational validation.
+       */
+      match /businessProfiles/{businessProfileId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidOwnerLink(userId) && isValidDocId(businessProfileId);
+        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+        allow delete: if isExistingOwner(userId);
+      }
+
+      /**
+       * @description Search queries performed by the user.
+       * @path /users/{userId}/searchQueries/{searchQueryId}
+       * @allow (list) If auth.uid matches path userId.
+       * @deny (update) If user tries to change the ownership field 'userId'.
+       * @principle Authorization independence through denormalized ownership fields.
+       */
+      match /searchQueries/{searchQueryId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidOwnerLink(userId) && isValidDocId(searchQueryId);
+        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+        allow delete: if isExistingOwner(userId);
+      }
+
+      /**
+       * @description Marketing Assets generated for a user.
+       * @path /users/{userId}/marketingAssets/{marketingAssetId}
+       * @allow (create) If target user matches current auth.
+       * @deny (create) If trying to set a different userId in the document than the path.
+       * @principle Consistent ownership across hierarchy.
+       */
+      match /marketingAssets/{marketingAssetId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidOwnerLink(userId) && isValidDocId(marketingAssetId);
+        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+        allow delete: if isExistingOwner(userId);
+      }
+
+      /**
+       * @description Marketing Campaigns created by the user.
+       * @path /users/{userId}/campaigns/{campaignId}
+       * @allow (update) If campaign is owned by the requester.
+       * @deny (delete) If the campaign document does not exist.
+       * @principle Existence check for destructive/modifying operations.
+       */
+      match /campaigns/{campaignId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidOwnerLink(userId) && isValidDocId(campaignId);
+        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+        allow delete: if isExistingOwner(userId);
+      }
+
+      /**
+       * @description User notes associated with business profiles.
+       * @path /users/{userId}/notes/{noteId}
+       * @allow (get) If note exists under the user's own path.
+       * @deny (create) If userId field is missing or incorrect.
+       * @principle Strict user-path scoping.
+       */
+      match /notes/{noteId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidOwnerLink(userId) && isValidDocId(noteId);
+        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+        allow delete: if isExistingOwner(userId);
+      }
+    }
+  }
+}
