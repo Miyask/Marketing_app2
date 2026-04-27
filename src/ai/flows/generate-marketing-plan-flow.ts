@@ -6,7 +6,7 @@
  * - generateMarketingPlan - A function that handles the generation of a full marketing strategy.
  */
 
-import { ai } from '@/ai/genkit';
+import { ai, runAIQuery } from '@/ai/genkit';
 import { z } from 'genkit';
 
 const MarketingPlanInputSchema = z.object({
@@ -19,6 +19,7 @@ const MarketingPlanInputSchema = z.object({
     modelId: z.string().optional(),
     googleApiKey: z.string().optional(),
     openaiApiKey: z.string().optional(),
+    openrouterApiKey: z.string().optional(),
   }).optional(),
 });
 export type MarketingPlanInput = z.infer<typeof MarketingPlanInputSchema>;
@@ -50,21 +51,6 @@ export async function generateMarketingPlan(input: MarketingPlanInput): Promise<
   return generateMarketingPlanFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'generateMarketingPlanPrompt',
-  input: { schema: MarketingPlanInputSchema },
-  output: { schema: MarketingPlanOutputSchema },
-  prompt: `You are a Senior Marketing Director. Create a high-level strategic marketing plan for:
-
-Business: {{{businessName}}}
-Industry: {{{industry}}}
-Audience: {{{targetAudience}}}
-Budget: {{{budget}}}
-Objectives: {{{objectives}}}
-
-Provide a comprehensive strategy including a SWOT analysis, channel recommendations, and a 4-week content calendar preview. Focus on practical, high-impact actions.`,
-});
-
 const generateMarketingPlanFlow = ai.defineFlow(
   {
     name: 'generateMarketingPlanFlow',
@@ -72,11 +58,52 @@ const generateMarketingPlanFlow = ai.defineFlow(
     outputSchema: MarketingPlanOutputSchema,
   },
   async (input) => {
-    const modelId = input.userConfig?.modelId || 'googleai/gemini-1.5-flash';
-    const { output } = await prompt(input, {
-      model: modelId,
+    const modelId = input.userConfig?.modelId || 'googleai/gemini-2.0-flash-exp';
+    
+    const promptText = `You are a Senior Marketing Director. Create a high-level strategic marketing plan for:
+
+Business: ${input.businessName}
+Industry: ${input.industry}
+Audience: ${input.targetAudience}
+Budget: ${input.budget}
+Objectives: ${input.objectives}
+
+Return ONLY a JSON object that matches this schema:
+{
+  "strategyTitle": "string",
+  "executiveSummary": "string",
+  "swotAnalysis": {
+    "strengths": ["string"],
+    "weaknesses": ["string"],
+    "opportunities": ["string"],
+    "threats": ["string"]
+  },
+  "recommendedChannels": [
+    { "name": "string", "reasoning": "string", "suggestedFormat": "string" }
+  ],
+  "contentCalendarPreview": [
+    { "week": "string", "topic": "string", "actionItem": "string" }
+  ],
+  "estimatedRoi": "string"
+}`;
+
+    const response = await runAIQuery({
+      modelId,
+      system: "You are an expert marketing strategist that only speaks JSON.",
+      prompt: promptText,
+      apiKey: input.userConfig?.googleApiKey,
+      openaiKey: input.userConfig?.openaiApiKey,
+      openrouterKey: input.userConfig?.openrouterApiKey,
+      jsonMode: true
     });
-    if (!output) throw new Error('Failed to generate marketing plan');
-    return output;
+
+    try {
+      // Clean potential markdown blocks if the model didn't output raw JSON
+      const cleanJson = response!.replace(/```json|```/g, '').trim();
+      return JSON.parse(cleanJson) as MarketingPlanOutput;
+    } catch (e) {
+      console.error("Failed to parse AI response:", response);
+      throw new Error('Failed to generate marketing plan due to invalid AI response format.');
+    }
   }
 );

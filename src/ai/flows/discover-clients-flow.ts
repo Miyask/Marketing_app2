@@ -4,7 +4,7 @@
  * @fileOverview A GenAI flow for discovering and analyzing potential clients/leads.
  */
 
-import { ai } from '@/ai/genkit';
+import { ai, runAIQuery } from '@/ai/genkit';
 import { z } from 'genkit';
 
 const DiscoverClientsInputSchema = z.object({
@@ -14,6 +14,7 @@ const DiscoverClientsInputSchema = z.object({
     modelId: z.string().optional(),
     googleApiKey: z.string().optional(),
     openaiApiKey: z.string().optional(),
+    openrouterApiKey: z.string().optional(),
   }).optional(),
 });
 export type DiscoverClientsInput = z.infer<typeof DiscoverClientsInputSchema>;
@@ -36,19 +37,6 @@ export async function discoverClients(input: DiscoverClientsInput): Promise<Disc
   return discoverClientsFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'discoverClientsPrompt',
-  input: { schema: DiscoverClientsInputSchema },
-  output: { schema: DiscoverClientsOutputSchema },
-  prompt: `You are an expert Sales Intelligence Agent. Your task is to perform a detailed market scan for:
-
-Sector: {{{sector}}}
-Location: {{{location}}}
-
-Identify 5 highly realistic potential clients in this area. Focus on providing actionable intelligence. 
-If specific business names are not available in your training data, use highly probable business names for that niche and location.`,
-});
-
 const discoverClientsFlow = ai.defineFlow(
   {
     name: 'discoverClientsFlow',
@@ -58,11 +46,43 @@ const discoverClientsFlow = ai.defineFlow(
   async (input) => {
     const modelId = input.userConfig?.modelId || 'googleai/gemini-2.0-flash-exp';
     
-    const { output } = await prompt(input, {
-      model: modelId,
+    const promptText = `You are an expert Sales Intelligence Agent. Your task is to perform a detailed market scan for:
+Sector: ${input.sector}
+Location: ${input.location}
+
+Identify 5 highly realistic potential clients in this area. Focus on providing actionable intelligence.
+
+Return ONLY a JSON object matching this schema:
+{
+  "leads": [
+    {
+      "name": "string",
+      "location": "string",
+      "sector": "string",
+      "rating": number,
+      "status": "Sin Marketing" | "Lead Caliente" | "Sin Web" | "Competidor" | "Baja Presencia RRSS",
+      "description": "string",
+      "suggestedAction": "string"
+    }
+  ],
+  "marketOverview": "string"
+}`;
+
+    const response = await runAIQuery({
+      modelId,
+      system: "You are a sales intelligence expert that only speaks JSON.",
+      prompt: promptText,
+      apiKey: input.userConfig?.googleApiKey,
+      openaiKey: input.userConfig?.openaiApiKey,
+      openrouterKey: input.userConfig?.openrouterApiKey,
+      jsonMode: true
     });
-    
-    if (!output) throw new Error('Failed to discover clients');
-    return output;
+
+    try {
+      const cleanJson = response!.replace(/```json|```/g, '').trim();
+      return JSON.parse(cleanJson) as DiscoverClientsOutput;
+    } catch (e) {
+      throw new Error('Failed to discover clients due to invalid AI response.');
+    }
   }
 );
