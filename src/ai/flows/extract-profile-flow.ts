@@ -1,7 +1,9 @@
 
 'use server';
 /**
- * @fileOverview A GenAI flow for extracting business profile data from a URL using AI reasoning.
+ * @fileOverview A GenAI flow for extracting deep business intelligence and owner data from a URL.
+ *
+ * - extractProfile - A function that handles the business scouting process.
  */
 
 import { ai, runAIQuery } from '@/ai/genkit';
@@ -19,14 +21,16 @@ const ExtractProfileInputSchema = z.object({
 export type ExtractProfileInput = z.infer<typeof ExtractProfileInputSchema>;
 
 const ExtractProfileOutputSchema = z.object({
-  businessName: z.string().describe('The name of the business.'),
-  owner: z.string().describe('The likely owner or key executive found.'),
-  email: z.string().describe('Corporate contact email.'),
-  phone: z.string().describe('Contact phone number.'),
-  industry: z.string().describe('The industry sector.'),
-  social: z.array(z.string()).describe('Social media presence detected.'),
-  competitors: z.array(z.string()).describe('Direct competitors in the same niche.'),
-  marketingGap: z.string().describe('A key marketing weakness identified from the site structure.'),
+  businessName: z.string().describe('The official name of the business.'),
+  ownerName: z.string().describe('The full name of the owner, CEO, or key decision maker.'),
+  ownerRole: z.string().describe('The specific title of the identified person.'),
+  email: z.string().describe('The primary contact or corporate email address.'),
+  phone: z.string().describe('The contact phone number.'),
+  industry: z.string().describe('The specific industry niche.'),
+  socialLinks: z.array(z.string()).describe('List of detected social media profiles.'),
+  competitors: z.array(z.string()).describe('Identified direct competitors.'),
+  marketingGap: z.string().describe('A critical marketing weakness or opportunity identified.'),
+  suggestedApproach: z.string().describe('A recommended first message or approach strategy.'),
 });
 export type ExtractProfileOutput = z.infer<typeof ExtractProfileOutputSchema>;
 
@@ -43,24 +47,27 @@ const extractProfileFlow = ai.defineFlow(
   async (input) => {
     const modelId = input.userConfig?.modelId || 'googleai/gemini-2.0-flash-exp';
     
-    const promptText = `You are an expert Digital Scout and OSINT Analyst. Your task is to analyze the following URL and extract detailed business intelligence.
-URL: ${input.url}
+    const promptText = `You are a Senior Digital Scout and OSINT Analyst. Your mission is to perform a deep tactical analysis of this URL: ${input.url}
+
+Identify the "Human Behind the Brand": find the owner, CEO, or director's full name and their specific role. Extract direct contact information and analyze their market positioning.
 
 Return ONLY a JSON object matching this schema:
 {
   "businessName": "string",
-  "owner": "string",
+  "ownerName": "string",
+  "ownerRole": "string",
   "email": "string",
   "phone": "string",
   "industry": "string",
-  "social": ["string"],
+  "socialLinks": ["string"],
   "competitors": ["string"],
-  "marketingGap": "string"
+  "marketingGap": "string",
+  "suggestedApproach": "string"
 }`;
 
     const response = await runAIQuery({
       modelId,
-      system: "You are an OSINT expert that only speaks JSON.",
+      system: "You are an expert in business intelligence and web scraping simulation. You only speak JSON.",
       prompt: promptText,
       apiKey: input.userConfig?.googleApiKey,
       openaiKey: input.userConfig?.openaiApiKey,
