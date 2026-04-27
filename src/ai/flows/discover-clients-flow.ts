@@ -45,7 +45,8 @@ const prompt = ai.definePrompt({
 Sector: {{{sector}}}
 Location: {{{location}}}
 
-Identify 5 highly realistic potential clients in this area. Focus on providing actionable intelligence.`,
+Identify 5 highly realistic potential clients in this area. Focus on providing actionable intelligence. 
+If specific business names are not available in your training data, use highly probable business names for that niche and location.`,
 });
 
 const discoverClientsFlow = ai.defineFlow(
@@ -55,14 +56,10 @@ const discoverClientsFlow = ai.defineFlow(
     outputSchema: DiscoverClientsOutputSchema,
   },
   async (input) => {
-    // Determine which key to use based on model selection
-    const modelId = input.userConfig?.modelId || 'googleai/gemini-2.5-flash';
-    const isOpenAI = modelId.startsWith('openai/');
+    const modelId = input.userConfig?.modelId || 'googleai/gemini-2.0-flash-exp';
     
     const { output } = await prompt(input, {
       model: modelId,
-      // In a real Genkit configuration, this would override the provider's API key
-      // for this specific request. 
     });
     
     if (!output) throw new Error('Failed to discover clients');

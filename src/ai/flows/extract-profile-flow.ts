@@ -11,7 +11,8 @@ const ExtractProfileInputSchema = z.object({
   url: z.string().url().describe('The URL of the business website to analyze.'),
   userConfig: z.object({
     modelId: z.string().optional(),
-    apiKey: z.string().optional(),
+    googleApiKey: z.string().optional(),
+    openaiApiKey: z.string().optional(),
   }).optional(),
 });
 export type ExtractProfileInput = z.infer<typeof ExtractProfileInputSchema>;
@@ -50,8 +51,9 @@ const extractProfileFlow = ai.defineFlow(
     outputSchema: ExtractProfileOutputSchema,
   },
   async (input) => {
+    const modelId = input.userConfig?.modelId || 'googleai/gemini-2.0-flash-exp';
     const { output } = await prompt(input, {
-      model: input.userConfig?.modelId || 'googleai/gemini-2.0-flash-exp',
+      model: modelId,
     });
     if (!output) throw new Error('Failed to extract profile data');
     return output;

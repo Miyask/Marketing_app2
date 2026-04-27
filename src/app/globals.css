@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -24,14 +25,6 @@
     --input: 20 10% 90%;
     --ring: 24 95% 53%;
     --radius: 1.5rem;
-    --sidebar-background: 30 20% 97%;
-    --sidebar-foreground: 20 15% 25%;
-    --sidebar-primary: 24 95% 53%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 30 15% 92%;
-    --sidebar-accent-foreground: 24 95% 45%;
-    --sidebar-border: 30 10% 90%;
-    --sidebar-ring: 24 95% 53%;
   }
 }
 
@@ -42,8 +35,9 @@
   body {
     @apply bg-background text-foreground;
     background-image: 
-      radial-gradient(at 0% 0%, hsla(24, 95%, 53%, 0.03) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, hsla(38, 90%, 55%, 0.03) 0px, transparent 50%);
+      radial-gradient(at 0% 0%, hsla(24, 95%, 53%, 0.05) 0px, transparent 40%),
+      radial-gradient(at 100% 100%, hsla(38, 90%, 55%, 0.05) 0px, transparent 40%),
+      radial-gradient(at 50% 50%, hsla(30, 40%, 98%, 1) 0px, transparent 100%);
     background-attachment: fixed;
   }
   h1, h2, h3, h4, h5, h6 {
@@ -52,32 +46,36 @@
 }
 
 .glass-card {
-  @apply bg-white/80 backdrop-blur-xl border border-white/40 shadow-[0_20px_50px_rgba(0,0,0,0.04)];
+  @apply bg-white/90 backdrop-blur-2xl border border-white/50 shadow-[0_20px_50px_rgba(0,0,0,0.04)];
 }
 
 .glow-primary {
-  box-shadow: 0 10px 40px -10px hsla(24, 95%, 53%, 0.4);
+  box-shadow: 0 20px 60px -15px hsla(24, 95%, 53%, 0.4);
 }
 
 .glow-accent {
-  box-shadow: 0 10px 40px -10px hsla(38, 90%, 55%, 0.3);
+  box-shadow: 0 20px 60px -15px hsla(38, 90%, 55%, 0.3);
 }
 
 .card-elevated {
-  @apply bg-white shadow-[0_10px_30px_-5px_rgba(0,0,0,0.03)] border-none;
+  @apply bg-white shadow-[0_15px_40px_-10px_rgba(0,0,0,0.05)] border-none;
 }
 
 @keyframes float {
   0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  50% { transform: translateY(-12px); }
   100% { transform: translateY(0px); }
 }
 
 .animate-float {
-  animation: float 6s ease-in-out infinite;
+  animation: float 8s ease-in-out infinite;
+}
+
+.input-glow:focus {
+  @apply ring-4 ring-primary/10 border-primary/30 outline-none;
+  box-shadow: 0 0 25px hsla(24, 95%, 53%, 0.1);
 }
 
 .transition-premium {
-  @apply transition-all duration-300;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 400ms cubic-bezier(0.23, 1, 0.32, 1);
 }
