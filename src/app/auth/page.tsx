@@ -31,23 +31,27 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Redirección automática si ya hay un usuario
   useEffect(() => {
     if (user && !isUserLoading) {
       router.push("/");
     }
   }, [user, isUserLoading, router]);
 
-  const syncUserProfile = (uid: string, userEmail: string | null, name?: string | null) => {
+  const syncUserProfile = async (uid: string, userEmail: string | null, name?: string | null) => {
     if (!db) return;
     const userRef = doc(db, "users", uid);
-    // Sincronización no bloqueante para mayor fluidez
-    setDoc(userRef, {
-      id: uid,
-      email: userEmail || "",
-      fullName: name || userEmail?.split('@')[0] || "Usuario Pro",
-      updatedAt: serverTimestamp(),
-      createdAt: serverTimestamp(),
-    }, { merge: true }).catch(err => console.error("Error silenciado en sync:", err));
+    try {
+      await setDoc(userRef, {
+        id: uid,
+        email: userEmail || "",
+        fullName: name || userEmail?.split('@')[0] || "Usuario Pro",
+        updatedAt: serverTimestamp(),
+        createdAt: serverTimestamp(),
+      }, { merge: true });
+    } catch (err) {
+      console.error("Error sincronizando perfil:", err);
+    }
   };
 
   const handleGoogleSignIn = async () => {
@@ -56,11 +60,10 @@ export default function AuthPage() {
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
-      syncUserProfile(result.user.uid, result.user.email, result.user.displayName);
-      toast({ title: "Bienvenido", description: "Accediendo con Google..." });
+      await syncUserProfile(result.user.uid, result.user.email, result.user.displayName);
+      router.push("/");
     } catch (error: any) {
       toast({ title: "Error", description: "No se pudo iniciar sesión con Google.", variant: "destructive" });
-    } finally {
       setLoading(false);
     }
   };
@@ -70,33 +73,30 @@ export default function AuthPage() {
     setLoading(true);
     try {
       const result = await signInAnonymously(auth);
-      syncUserProfile(result.user.uid, "anonymous", "Invitado");
-      toast({ title: "Modo Demo", description: "Entrando como invitado al instante." });
+      await syncUserProfile(result.user.uid, null, "Invitado Demo");
+      router.push("/");
     } catch (error: any) {
       toast({ title: "Error", description: "Error al entrar como invitado.", variant: "destructive" });
-    } finally {
       setLoading(false);
     }
   };
 
   const handleEmailAuth = async (type: 'login' | 'register') => {
     if (!auth || !email || !password) {
-      toast({ title: "Faltan campos", description: "Rellena email y contraseña o entra como invitado.", variant: "destructive" });
+      toast({ title: "Campos vacíos", description: "Por favor rellena el email y la contraseña.", variant: "destructive" });
       return;
     }
     setLoading(true);
     try {
-      let result;
       if (type === 'login') {
-        result = await signInWithEmailAndPassword(auth, email, password);
+        await signInWithEmailAndPassword(auth, email, password);
       } else {
-        result = await createUserWithEmailAndPassword(auth, email, password);
-        syncUserProfile(result.user.uid, email);
+        const result = await createUserWithEmailAndPassword(auth, email, password);
+        await syncUserProfile(result.user.uid, email);
       }
-      toast({ title: "Éxito", description: "Accediendo al panel..." });
+      router.push("/");
     } catch (error: any) {
-      toast({ title: "Error", description: "Credenciales incorrectas o error de red.", variant: "destructive" });
-    } finally {
+      toast({ title: "Error de acceso", description: "Email o contraseña incorrectos.", variant: "destructive" });
       setLoading(false);
     }
   };
@@ -161,9 +161,9 @@ export default function AuthPage() {
                 onClick={handleAnonymousSignIn}
                 disabled={loading}
               >
-                <UserCircle className="w-6 h-6 text-accent group-hover:scale-110 transition-transform" />
-                Entrar como Invitado
-                <ArrowRight className="w-4 h-4 ml-auto opacity-50" />
+                {loading ? <Loader2 className="w-6 h-6 animate-spin text-accent" /> : <UserCircle className="w-6 h-6 text-accent group-hover:scale-110 transition-transform" />}
+                {loading ? "Iniciando..." : "Entrar como Invitado"}
+                {!loading && <ArrowRight className="w-4 h-4 ml-auto opacity-50" />}
               </Button>
 
               <div className="relative w-full">
@@ -196,14 +196,14 @@ export default function AuthPage() {
                     <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="h-11 bg-white/5 border-white/10 text-white text-sm" />
                     <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Contraseña" className="h-11 bg-white/5 border-white/10 text-white text-sm" />
                     <Button className="w-full h-12 bg-primary hover:bg-primary/90 font-bold rounded-xl" onClick={() => handleEmailAuth('login')} disabled={loading}>
-                      Entrar
+                      {loading ? "Entrando..." : "Entrar"}
                     </Button>
                   </TabsContent>
                   <TabsContent value="register" className="space-y-3">
                     <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Tu Email" className="h-11 bg-white/5 border-white/10 text-white text-sm" />
                     <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Nueva Contraseña" className="h-11 bg-white/5 border-white/10 text-white text-sm" />
                     <Button className="w-full h-12 bg-primary hover:bg-primary/90 font-bold rounded-xl" onClick={() => handleEmailAuth('register')} disabled={loading}>
-                      Crear Cuenta
+                      {loading ? "Creando..." : "Crear Cuenta"}
                     </Button>
                   </TabsContent>
                 </Tabs>
