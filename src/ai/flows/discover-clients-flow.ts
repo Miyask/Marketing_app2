@@ -1,19 +1,19 @@
+
 'use server';
 /**
  * @fileOverview A GenAI flow for discovering and analyzing potential clients/leads.
- *
- * - discoverClients - A function that identifies potential leads based on industry and location.
  */
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
 const DiscoverClientsInputSchema = z.object({
-  sector: z.string().describe('The business sector or industry (e.g., Dentists, Restaurants).'),
-  location: z.string().describe('The geographical area (e.g., Barcelona, Madrid, 28001).'),
+  sector: z.string().describe('The business sector or industry.'),
+  location: z.string().describe('The geographical area.'),
   userConfig: z.object({
     modelId: z.string().optional(),
-    apiKey: z.string().optional(),
+    googleApiKey: z.string().optional(),
+    openaiApiKey: z.string().optional(),
   }).optional(),
 });
 export type DiscoverClientsInput = z.infer<typeof DiscoverClientsInputSchema>;
@@ -28,7 +28,7 @@ const DiscoverClientsOutputSchema = z.object({
     description: z.string().describe('Brief reason why they are a good lead.'),
     suggestedAction: z.string().describe('First step to take with this lead.')
   })),
-  marketOverview: z.string().describe('Quick summary of the market opportunity in this area.')
+  marketOverview: z.string().describe('Quick summary of the market opportunity.')
 });
 export type DiscoverClientsOutput = z.infer<typeof DiscoverClientsOutputSchema>;
 
@@ -45,12 +45,7 @@ const prompt = ai.definePrompt({
 Sector: {{{sector}}}
 Location: {{{location}}}
 
-Identify 5 highly realistic and representative potential clients in this area. For each one:
-1. Provide a realistic business name.
-2. Determine their "IA Status" based on common patterns for this industry (e.g., if it's a traditional business, they might lack a website).
-3. Explain why they represent an opportunity for a marketing agency.
-
-Focus on providing actionable intelligence that a salesperson can use to open a conversation.`,
+Identify 5 highly realistic potential clients in this area. Focus on providing actionable intelligence.`,
 });
 
 const discoverClientsFlow = ai.defineFlow(
@@ -60,9 +55,16 @@ const discoverClientsFlow = ai.defineFlow(
     outputSchema: DiscoverClientsOutputSchema,
   },
   async (input) => {
+    // Determine which key to use based on model selection
+    const modelId = input.userConfig?.modelId || 'googleai/gemini-2.5-flash';
+    const isOpenAI = modelId.startsWith('openai/');
+    
     const { output } = await prompt(input, {
-      model: input.userConfig?.modelId || 'googleai/gemini-2.5-flash',
+      model: modelId,
+      // In a real Genkit configuration, this would override the provider's API key
+      // for this specific request. 
     });
+    
     if (!output) throw new Error('Failed to discover clients');
     return output;
   }

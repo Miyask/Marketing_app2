@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Sparkles, Loader2, Target, Calendar, BarChart, ShieldAlert, CheckCircle2, Layout, FileText, ChevronRight, Cpu } from "lucide-react";
+import { Sparkles, Loader2, Target, Calendar, ShieldAlert, CheckCircle2, FileText, ChevronRight, Cpu } from "lucide-react";
 import { generateMarketingPlan, type MarketingPlanOutput } from "@/ai/flows/generate-marketing-plan-flow";
 import { useUser, useFirestore, useDoc, useMemoFirebase } from "@/firebase";
 import { doc } from "firebase/firestore";
@@ -35,10 +35,20 @@ export function PlanGenerator() {
   });
 
   const handleGenerate = async () => {
-    if (profile?.aiSettings?.apiKey === "") {
+    const aiSettings = profile?.aiSettings;
+    const modelId = aiSettings?.modelId || "";
+    
+    // Validar que tengamos la llave correcta para el modelo elegido
+    const hasGoogleKey = !!aiSettings?.googleApiKey;
+    const hasOpenAIKey = !!aiSettings?.openaiApiKey;
+    
+    const needsGoogle = modelId.startsWith('googleai/');
+    const needsOpenAI = modelId.startsWith('openai/');
+
+    if ((needsGoogle && !hasGoogleKey) || (needsOpenAI && !hasOpenAIKey)) {
       toast({ 
-        title: "API Key requerida", 
-        description: "Por favor, configura tu API Key en Ajustes de IA para continuar.",
+        title: "API Key Requerida", 
+        description: `Por favor, configura tu llave para ${needsGoogle ? 'Google' : 'OpenAI'} en Ajustes de IA.`,
         variant: "destructive"
       });
       return;
@@ -48,12 +58,12 @@ export function PlanGenerator() {
     try {
       const result = await generateMarketingPlan({
         ...formData,
-        userConfig: profile?.aiSettings
+        userConfig: aiSettings
       });
       setPlan(result);
       toast({ title: "¡Estrategia Generada!", description: "He analizado tu sector y creado un plan maestro." });
     } catch (error) {
-      toast({ title: "Error", description: "La IA está ocupada o tu clave es inválida.", variant: "destructive" });
+      toast({ title: "Error", description: "Hubo un problema con el proveedor de IA. Revisa tus claves.", variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -106,7 +116,7 @@ export function PlanGenerator() {
             </div>
             <h3 className="text-3xl font-headline font-bold text-white mb-4">Motor de Estrategia AI</h3>
             <p className="text-muted-foreground max-w-md text-lg leading-relaxed">
-              Configura tu API Key en ajustes y pulsa generar para ver tu plan maestro de 360 grados.
+              Configura tus API Keys en ajustes y elige entre Gemini o GPT-4 para crear tu plan maestro.
             </p>
           </div>
         )}
@@ -118,8 +128,8 @@ export function PlanGenerator() {
               <Sparkles className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 text-primary animate-pulse" />
             </div>
             <div className="text-center">
-              <p className="text-xl font-headline font-bold text-white">Analizando Oportunidades</p>
-              <p className="text-muted-foreground animate-pulse">Usando tu configuración personalizada...</p>
+              <p className="text-xl font-headline font-bold text-white">Consultando al Experto</p>
+              <p className="text-muted-foreground animate-pulse">Usando tu modelo {profile?.aiSettings?.modelId?.split('/').pop()}...</p>
             </div>
           </div>
         )}
@@ -141,7 +151,7 @@ export function PlanGenerator() {
                    </div>
                    <div className="bg-white/10 backdrop-blur-md px-6 py-4 rounded-2xl border border-white/20">
                       <p className="text-[10px] font-bold uppercase tracking-widest text-white/60 mb-1">Cerebro AI</p>
-                      <p className="text-xl font-headline font-bold uppercase">{profile?.aiSettings?.modelId?.split('-').pop()}</p>
+                      <p className="text-xl font-headline font-bold uppercase">{profile?.aiSettings?.modelId?.split('/').pop()}</p>
                    </div>
                 </div>
               </div>
