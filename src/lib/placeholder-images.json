@@ -1,3 +1,22 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-marketing",
+      "description": "Abstract strategic growth and business data visualization",
+      "imageUrl": "https://picsum.photos/seed/market1/1200/600",
+      "imageHint": "marketing growth"
+    },
+    {
+      "id": "team-collaboration",
+      "description": "Professional team analyzing data in a modern office",
+      "imageUrl": "https://picsum.photos/seed/market2/800/600",
+      "imageHint": "business office"
+    },
+    {
+      "id": "dashboard-preview",
+      "description": "Modern data dashboard interface",
+      "imageUrl": "https://picsum.photos/seed/market3/600/400",
+      "imageHint": "data analytics"
+    }
+  ]
 }
