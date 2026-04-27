@@ -1,16 +1,18 @@
+
 "use client";
 
 import React, { useState } from "react";
-import { Sparkles, Loader2, Calendar, ShieldAlert, CheckCircle2, ChevronRight, Cpu, BarChart3, Presentation } from "lucide-react";
+import { Sparkles, Loader2, Calendar, ShieldAlert, CheckCircle2, ChevronRight, Cpu, BarChart3, Presentation, Save } from "lucide-react";
 import { generateMarketingPlan, type MarketingPlanOutput } from "@/ai/flows/generate-marketing-plan-flow";
 import { useUser, useFirestore, useDoc, useMemoFirebase } from "@/firebase";
-import { doc } from "firebase/firestore";
+import { doc, collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 
 export function PlanGenerator() {
   const { user } = useUser();
@@ -18,6 +20,7 @@ export function PlanGenerator() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [plan, setPlan] = useState<MarketingPlanOutput | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const userRef = useMemoFirebase(() => {
     if (!db || !user?.uid) return null;
@@ -47,6 +50,27 @@ export function PlanGenerator() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSavePlan = () => {
+    if (!db || !user?.uid || !plan) return;
+    setIsSaving(true);
+    
+    const campaignsRef = collection(db, "users", user.uid, "campaigns");
+    const campaignId = Math.random().toString(36).substring(7);
+    
+    addDocumentNonBlocking(campaignRef, {
+      id: campaignId,
+      userId: user.uid,
+      name: plan.strategyTitle,
+      status: "Planificado",
+      startDate: new Date().toISOString(),
+      createdAt: serverTimestamp(),
+      planData: plan
+    });
+
+    toast({ title: "Campaña Guardada", description: "El plan se ha guardado en tu pipeline de crecimiento." });
+    setIsSaving(false);
   };
 
   return (
@@ -123,12 +147,12 @@ export function PlanGenerator() {
         )}
 
         {loading && (
-          <div className="h-full flex flex-col items-center justify-center space-y-6 animate-pulse">
+          <div className="h-full flex flex-col items-center justify-center space-y-6 animate-pulse bg-white rounded-[2.5rem] p-20 shadow-sm">
             <div className="relative">
               <div className="w-20 h-20 border-4 border-primary/10 border-t-primary rounded-full animate-spin" />
               <Sparkles className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 text-primary" />
             </div>
-            <p className="text-lg font-bold text-foreground uppercase tracking-widest">Escaneando Vectores...</p>
+            <p className="text-lg font-bold text-foreground uppercase tracking-widest">Escaneando Vectores Estratégicos...</p>
           </div>
         )}
 
@@ -136,7 +160,18 @@ export function PlanGenerator() {
           <div className="space-y-8 animate-fade-in pb-20">
             <Card className="border-none bg-primary text-white overflow-hidden rounded-[2.5rem] p-10 shadow-xl relative group">
               <div className="relative z-10">
-                <Badge className="mb-6 bg-white/20 text-white border-none px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest">ESTRATEGIA VALIDADA POR IA</Badge>
+                <div className="flex justify-between items-start mb-6">
+                  <Badge className="bg-white/20 text-white border-none px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase">Estrategia Validada</Badge>
+                  <Button 
+                    variant="outline" 
+                    className="bg-white/10 border-white/20 text-white hover:bg-white/20 rounded-xl"
+                    onClick={handleSavePlan}
+                    disabled={isSaving}
+                  >
+                    {isSaving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
+                    Guardar en Pipeline
+                  </Button>
+                </div>
                 <h3 className="text-5xl font-headline font-bold mb-6 tracking-tighter">{plan.strategyTitle}</h3>
                 <p className="text-xl text-white/90 leading-relaxed mb-10 max-w-3xl font-light italic pl-6 border-l-2 border-white/20">{plan.executiveSummary}</p>
                 
@@ -146,8 +181,8 @@ export function PlanGenerator() {
                       <p className="text-3xl font-headline font-bold">{plan.estimatedRoi}</p>
                    </div>
                    <div className="bg-white/10 px-6 py-4 rounded-2xl border border-white/10">
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-white/60 mb-1">Canales Clave</p>
-                      <p className="text-xl font-headline font-bold">{plan.recommendedChannels.length} Recomendados</p>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-white/60 mb-1">Canales Recomendados</p>
+                      <p className="text-xl font-headline font-bold">{plan.recommendedChannels.length} Canales Clave</p>
                    </div>
                 </div>
               </div>
@@ -157,7 +192,7 @@ export function PlanGenerator() {
               <Card className="border-none shadow-sm p-8 bg-white rounded-[2rem]">
                 <div className="flex items-center gap-4 mb-6 text-primary">
                   <ShieldAlert className="w-6 h-6" />
-                  <h4 className="text-xl font-headline font-bold text-foreground">Análisis SWOT</h4>
+                  <h4 className="text-xl font-headline font-bold text-foreground">Análisis SWOT AI</h4>
                 </div>
                 <div className="space-y-6">
                   <div className="space-y-3">
@@ -182,7 +217,7 @@ export function PlanGenerator() {
               <Card className="border-none shadow-sm p-8 bg-white rounded-[2rem]">
                 <div className="flex items-center gap-4 mb-6 text-accent">
                   <Calendar className="w-6 h-6" />
-                  <h4 className="text-xl font-headline font-bold text-foreground">Roadmap de Ejecución</h4>
+                  <h4 className="text-xl font-headline font-bold text-foreground">Hoja de Ruta (4 Semanas)</h4>
                 </div>
                 <div className="space-y-4">
                   {plan.contentCalendarPreview.map((item, i) => (

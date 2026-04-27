@@ -5,24 +5,56 @@ import React from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Mail, Phone, ExternalLink, Calendar } from "lucide-react";
+import { MoreHorizontal, Mail, Phone, ExternalLink, Calendar, Loader2, Database } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
+import { collection, doc, deleteDoc } from "firebase/firestore";
+import { useToast } from "@/hooks/use-toast";
+import { deleteDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 
 interface LeadListProps {
   limit?: number;
 }
 
 export function LeadList({ limit }: LeadListProps) {
-  const allLeads = [
-    { id: "L001", name: "Innova Solar SL", contact: "Carlos Menéndez", email: "c.menendez@innovasolar.es", phone: "912 345 678", status: "Caliente", source: "Extractor URL", date: "Hoy, 10:30" },
-    { id: "L002", name: "Restaurante Gaia", contact: "Elena Torres", email: "info@gaiabcn.com", phone: "934 567 890", status: "Frío", source: "Búsqueda Local", date: "Ayer" },
-    { id: "L003", name: "Tech Solutions Ltd", contact: "Mark Wilson", email: "m.wilson@techsol.co.uk", phone: "+44 20 7946 0958", status: "En Negociación", source: "Scrapping", date: "15 Oct" },
-    { id: "L004", name: "Moda Eco S.A.", contact: "Ana Beltrán", email: "beltran@modaeco.es", phone: "915 234 567", status: "Caliente", source: "Extractor URL", date: "14 Oct" },
-    { id: "L005", name: "Gimnasio FitLife", contact: "Sergio Ramos", email: "admin@fitlife.es", phone: "932 112 233", status: "Cerrado", source: "Búsqueda Local", date: "12 Oct" },
-    { id: "L006", name: "Consultores ABC", contact: "Laura Gil", email: "lgil@abc.es", phone: "911 223 344", status: "Frío", source: "Scrapping", date: "10 Oct" },
-  ];
+  const { user } = useUser();
+  const db = useFirestore();
+  const { toast } = useToast();
 
-  const leads = limit ? allLeads.slice(0, limit) : allLeads;
+  const businessProfilesQuery = useMemoFirebase(() => {
+    if (!db || !user?.uid) return null;
+    return collection(db, "users", user.uid, "businessProfiles");
+  }, [db, user?.uid]);
+
+  const { data: leads, isLoading } = useCollection(businessProfilesQuery);
+
+  const handleDelete = (leadId: string) => {
+    if (!db || !user?.uid) return;
+    const docRef = doc(db, "users", user.uid, "businessProfiles", leadId);
+    deleteDocumentNonBlocking(docRef);
+    toast({ title: "Lead eliminado", description: "El prospecto ha sido borrado de tu pipeline." });
+  };
+
+  if (isLoading) return (
+    <div className="flex flex-col items-center justify-center py-20 gap-4">
+      <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest">Cargando Leads...</p>
+    </div>
+  );
+
+  if (!leads || leads.length === 0) return (
+    <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
+      <div className="bg-muted/30 p-6 rounded-3xl">
+        <Database className="w-10 h-10 text-muted-foreground/30" />
+      </div>
+      <h3 className="text-xl font-headline font-bold text-foreground">Pipeline Vacío</h3>
+      <p className="text-sm text-muted-foreground max-w-xs">
+        Utiliza el <strong>Market Discovery</strong> o el <strong>Extractor</strong> para añadir clientes potenciales.
+      </p>
+    </div>
+  );
+
+  const displayLeads = limit ? leads.slice(0, limit) : leads;
 
   return (
     <div className="rounded-md overflow-hidden">
@@ -31,49 +63,49 @@ export function LeadList({ limit }: LeadListProps) {
           <TableHeader className="bg-muted/20">
             <TableRow>
               <TableHead className="w-[200px]">Empresa</TableHead>
-              <TableHead>Contacto</TableHead>
-              <TableHead>Estado</TableHead>
-              <TableHead>Origen</TableHead>
+              <TableHead>Contacto / Info</TableHead>
+              <TableHead>Estatus</TableHead>
+              <TableHead>Industria</TableHead>
               <TableHead>Fecha</TableHead>
               <TableHead className="text-right">Acciones</TableHead>
             </TableRow>
           </TableHeader>
         )}
         <TableBody>
-          {leads.map((lead) => (
+          {displayLeads.map((lead) => (
             <TableRow key={lead.id} className="group hover:bg-muted/10 transition-colors">
               <TableCell>
-                <div className="font-semibold">{lead.name}</div>
-                <div className="text-[10px] text-muted-foreground font-mono">{lead.id}</div>
+                <div className="font-semibold text-foreground">{lead.name}</div>
+                <div className="text-[10px] text-muted-foreground font-mono flex items-center gap-1">
+                   <ExternalLink className="w-2.5 h-2.5" /> {lead.url?.replace(/^https?:\/\//, '') || "Sin URL"}
+                </div>
               </TableCell>
               <TableCell>
-                <div className="text-sm">{lead.contact}</div>
+                <div className="text-sm font-medium">{lead.ownerName || "Por contactar"}</div>
                 <div className="text-[10px] text-muted-foreground flex items-center gap-1">
-                  <Mail className="w-2.5 h-2.5" /> {lead.email}
+                  <Mail className="w-2.5 h-2.5" /> {lead.email || "No disponible"}
                 </div>
               </TableCell>
               <TableCell>
                 <Badge 
                   variant="outline" 
                   className={
-                    lead.status === "Caliente" 
+                    lead.leadStatus === "Lead Caliente" 
                       ? "bg-accent/10 text-accent-foreground border-accent/20" 
-                      : lead.status === "Cerrado"
+                      : lead.leadStatus === "Cerrado"
                       ? "bg-emerald-50 text-emerald-600 border-emerald-100"
                       : "bg-muted/50 text-muted-foreground border-transparent"
                   }
                 >
-                  {lead.status}
+                  {lead.leadStatus}
                 </Badge>
               </TableCell>
               <TableCell className="text-muted-foreground text-sm">
-                <div className="flex items-center gap-1">
-                  <ExternalLink className="w-3 h-3" /> {lead.source}
-                </div>
+                <Badge variant="secondary" className="bg-white border-border text-[9px] px-2">{lead.industry || "General"}</Badge>
               </TableCell>
               <TableCell className="text-muted-foreground text-sm">
                 <div className="flex items-center gap-1">
-                  <Calendar className="w-3 h-3" /> {lead.date}
+                  <Calendar className="w-3 h-3" /> {new Date(lead.createdAt).toLocaleDateString()}
                 </div>
               </TableCell>
               <TableCell className="text-right">
@@ -84,16 +116,16 @@ export function LeadList({ limit }: LeadListProps) {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuLabel>Opciones de Lead</DropdownMenuLabel>
+                    <DropdownMenuLabel>Gestión de Lead</DropdownMenuLabel>
                     <DropdownMenuItem className="flex items-center gap-2">
-                      <Mail className="w-4 h-4" /> Enviar Email
+                      <Mail className="w-4 h-4" /> Contactar via Email
                     </DropdownMenuItem>
                     <DropdownMenuItem className="flex items-center gap-2">
-                      <Phone className="w-4 h-4" /> Llamar
+                      <Phone className="w-4 h-4" /> Registrar Llamada
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-primary font-medium">Ver Estrategia AI</DropdownMenuItem>
-                    <DropdownMenuItem className="text-destructive">Eliminar Lead</DropdownMenuItem>
+                    <DropdownMenuItem className="text-primary font-bold">Ver Análisis AI</DropdownMenuItem>
+                    <DropdownMenuItem className="text-destructive font-bold" onClick={() => handleDelete(lead.id)}>Eliminar Lead</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TableCell>
