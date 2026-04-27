@@ -16,7 +16,9 @@ import {
   Sparkles,
   TrendingUp,
   Loader2,
-  Cpu
+  Cpu,
+  Search,
+  Globe
 } from "lucide-react";
 import {
   Sidebar,
@@ -42,27 +44,18 @@ import { AssetGenerator } from "@/components/marketing/asset-generator";
 import { LeadList } from "@/components/leads/lead-list";
 import { RoiCalculator } from "@/components/roi/roi-calculator";
 import { AISettings } from "@/components/settings/ai-settings";
+import { ProfileExtractor } from "@/components/prospector/profile-extractor";
+import { ClientDiscovery } from "@/components/prospector/client-discovery";
 
 export default function MarketScoutDashboard() {
-  const { user, isUserLoading } = useUser();
+  const { user } = useUser();
   const { auth } = useAuth();
-  const router = useRouter();
   const [activeTab, setActiveTab] = useState("strategy");
-
-  // Eliminamos la redirección forzada para permitir ver la página directamente
-  /*
-  useEffect(() => {
-    if (!isUserLoading && !user) {
-      router.push("/auth");
-    }
-  }, [user, isUserLoading, router]);
-  */
 
   const handleSignOut = async () => {
     if (auth) await signOut(auth);
   };
 
-  // Renderizamos el dashboard directamente, ignorando si está cargando el usuario para no bloquear la vista
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="flex min-h-screen w-full overflow-hidden bg-[#02040a]">
@@ -74,13 +67,13 @@ export default function MarketScoutDashboard() {
               </div>
               <div>
                 <h1 className="text-xl font-headline font-bold text-white tracking-tight">MarketScout</h1>
-                <Badge variant="outline" className="text-[9px] uppercase tracking-tighter border-primary/30 text-primary">Pro Strategist</Badge>
+                <Badge variant="outline" className="text-[9px] uppercase tracking-tighter border-primary/30 text-primary">Intelligence Suite</Badge>
               </div>
             </div>
           </SidebarHeader>
           <SidebarContent className="px-4">
             <SidebarGroup>
-              <SidebarGroupLabel className="text-muted-foreground/30 px-4 text-[10px] tracking-widest uppercase font-bold mb-2">Estrategia AI</SidebarGroupLabel>
+              <SidebarGroupLabel className="text-muted-foreground/30 px-4 text-[10px] tracking-widest uppercase font-bold mb-2">Estrategia & IA</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
@@ -95,12 +88,12 @@ export default function MarketScoutDashboard() {
                   </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton 
-                      isActive={activeTab === "generator"} 
-                      onClick={() => setActiveTab("generator")}
+                      isActive={activeTab === "assets"} 
+                      onClick={() => setActiveTab("assets")}
                       className="h-12 rounded-xl data-[active=true]:bg-primary data-[active=true]:text-white transition-all duration-300"
                     >
                       <Zap className="w-4 h-4" />
-                      <span className="font-bold">Activos Creativos</span>
+                      <span className="font-bold">Motor Creativo</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </SidebarMenu>
@@ -108,7 +101,27 @@ export default function MarketScoutDashboard() {
             </SidebarGroup>
 
             <SidebarGroup>
-              <SidebarGroupLabel className="text-muted-foreground/30 px-4 text-[10px] tracking-widest uppercase font-bold mb-2">Resultados</SidebarGroupLabel>
+              <SidebarGroupLabel className="text-muted-foreground/30 px-4 text-[10px] tracking-widest uppercase font-bold mb-2">Prospección</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton isActive={activeTab === "discovery"} onClick={() => setActiveTab("discovery")} className="h-12 rounded-xl">
+                      <Search className="w-4 h-4" />
+                      <span className="font-medium">Discovery de Clientes</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton isActive={activeTab === "extractor"} onClick={() => setActiveTab("extractor")} className="h-12 rounded-xl">
+                      <Globe className="w-4 h-4" />
+                      <span className="font-medium">Scrapping Perfil</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+
+            <SidebarGroup>
+              <SidebarGroupLabel className="text-muted-foreground/30 px-4 text-[10px] tracking-widest uppercase font-bold mb-2">Crecimiento</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
@@ -120,7 +133,7 @@ export default function MarketScoutDashboard() {
                   <SidebarMenuItem>
                     <SidebarMenuButton isActive={activeTab === "roi"} onClick={() => setActiveTab("roi")} className="h-12 rounded-xl">
                       <BarChart3 className="w-4 h-4" />
-                      <span className="font-medium">Calculadora ROI</span>
+                      <span className="font-medium">Simulador ROI</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </SidebarMenu>
@@ -128,7 +141,7 @@ export default function MarketScoutDashboard() {
             </SidebarGroup>
 
             <SidebarGroup>
-              <SidebarGroupLabel className="text-muted-foreground/30 px-4 text-[10px] tracking-widest uppercase font-bold mb-2">Configuración</SidebarGroupLabel>
+              <SidebarGroupLabel className="text-muted-foreground/30 px-4 text-[10px] tracking-widest uppercase font-bold mb-2">Sistema</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
@@ -138,7 +151,7 @@ export default function MarketScoutDashboard() {
                       className="h-12 rounded-xl data-[active=true]:bg-primary data-[active=true]:text-white"
                     >
                       <Cpu className="w-4 h-4" />
-                      <span className="font-medium">Ajustes de IA</span>
+                      <span className="font-medium">Configuración IA</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </SidebarMenu>
@@ -154,18 +167,10 @@ export default function MarketScoutDashboard() {
                 <div className="flex-1 overflow-hidden">
                   <p className="text-xs font-bold truncate text-white">{user?.isAnonymous ? "Invitado" : (user?.displayName || "Usuario Pro")}</p>
                   <button onClick={handleSignOut} className="text-[10px] text-destructive/80 flex items-center gap-1 hover:text-destructive hover:underline transition-colors">
-                    <LogOut className="w-2.5 h-2.5" /> Cerrar Sesión
+                    <LogOut className="w-2.5 h-2.5" /> Salir
                   </button>
                 </div>
               </div>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="w-full h-8 text-[9px] font-bold border-white/10 hover:bg-white/5 uppercase tracking-widest"
-                onClick={() => setActiveTab("settings")}
-              >
-                <Settings className="w-3 h-3 mr-1" /> Preferencias
-              </Button>
             </div>
           </SidebarFooter>
         </Sidebar>
@@ -176,7 +181,7 @@ export default function MarketScoutDashboard() {
             <div className="flex-1" />
             <div className="flex items-center gap-6">
               <div className="hidden md:flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-bold tracking-widest uppercase">
-                <TrendingUp className="w-3 h-3" /> Estatus: Optimizado
+                <TrendingUp className="w-3 h-3" /> Motor Optimizado
               </div>
               <Button size="sm" className="bg-primary hover:bg-primary/90 text-white font-bold rounded-full px-6 glow-primary h-10 shadow-xl transition-all active:scale-[0.97]">
                 <Rocket className="mr-2 h-4 w-4" /> UPGRADE ELITE
@@ -185,39 +190,60 @@ export default function MarketScoutDashboard() {
           </header>
 
           <main className="p-8 lg:p-12 max-w-7xl mx-auto w-full">
-            <div className="animate-fade-in space-y-16">
+            <div className="animate-fade-in">
               {activeTab === "strategy" && (
                 <div className="space-y-10">
-                  <div className="flex flex-col gap-6">
+                  <div className="flex flex-col gap-4">
                     <div className="flex items-center gap-3 text-primary font-bold text-xs tracking-[0.4em] uppercase">
-                      <Sparkles className="w-4 h-4" /> Consultoría Estratégica 2.0
+                      <Sparkles className="w-4 h-4" /> Inteligencia Estratégica
                     </div>
                     <h2 className="text-6xl font-headline font-bold text-white tracking-tighter leading-tight">
-                      Diseña tu Plan <br /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent italic">Maestro AI</span>
+                      Plan Maestro <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">360°</span>
                     </h2>
-                    <p className="text-muted-foreground text-xl max-w-2xl leading-relaxed font-medium">
-                      Tu hoja de ruta estratégica, analizada y optimizada por modelos de IA especializados en crecimiento empresarial.
-                    </p>
                   </div>
                   <PlanGenerator />
                 </div>
               )}
 
-              {activeTab === "generator" && (
+              {activeTab === "assets" && (
                 <div className="space-y-10">
-                  <div className="flex flex-col gap-6">
+                  <div className="flex flex-col gap-4">
                     <div className="flex items-center gap-3 text-accent font-bold text-xs tracking-[0.4em] uppercase">
-                      <Zap className="w-4 h-4" /> Creative Engine
+                      <Zap className="w-4 h-4" /> Generador de Activos
                     </div>
-                    <h2 className="text-6xl font-headline font-bold text-white tracking-tighter">Activos de <span className="text-accent">Marketing</span></h2>
+                    <h2 className="text-6xl font-headline font-bold text-white tracking-tighter">Slogans, <span className="text-accent">Logo</span> & Folletos</h2>
                   </div>
                   <AssetGenerator />
                 </div>
               )}
 
+              {activeTab === "discovery" && (
+                <div className="space-y-10">
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-center gap-3 text-primary font-bold text-xs tracking-[0.4em] uppercase">
+                      <Search className="w-4 h-4" /> Inteligencia de Mercado
+                    </div>
+                    <h2 className="text-6xl font-headline font-bold text-white tracking-tighter">Buscador de <span className="text-primary">Prospectos</span></h2>
+                  </div>
+                  <ClientDiscovery />
+                </div>
+              )}
+
+              {activeTab === "extractor" && (
+                <div className="space-y-10">
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-center gap-3 text-emerald-500 font-bold text-xs tracking-[0.4em] uppercase">
+                      <Globe className="w-4 h-4" /> Web Data Extraction
+                    </div>
+                    <h2 className="text-6xl font-headline font-bold text-white tracking-tighter">Analizar <span className="text-emerald-500">Negocio</span></h2>
+                  </div>
+                  <ProfileExtractor />
+                </div>
+              )}
+
               {activeTab === "leads" && (
                 <div className="space-y-10">
-                  <h2 className="text-6xl font-headline font-bold text-white tracking-tighter">CRM <span className="text-primary">&</span> Prospectos</h2>
+                  <h2 className="text-6xl font-headline font-bold text-white tracking-tighter">Gestión de <span className="text-primary">Oportunidades</span></h2>
                   <div className="glass-card rounded-3xl p-6 overflow-hidden">
                     <LeadList />
                   </div>
@@ -233,15 +259,7 @@ export default function MarketScoutDashboard() {
 
               {activeTab === "settings" && (
                 <div className="space-y-10">
-                  <div className="flex flex-col gap-6">
-                    <div className="flex items-center gap-3 text-primary font-bold text-xs tracking-[0.4em] uppercase">
-                      <Cpu className="w-4 h-4" /> Personalización Tecnológica
-                    </div>
-                    <h2 className="text-6xl font-headline font-bold text-white tracking-tighter">Ajustes de <span className="text-primary">IA</span></h2>
-                    <p className="text-muted-foreground text-xl max-w-2xl leading-relaxed">
-                      Configura tus propias API Keys y elige el cerebro que impulsará tus estrategias de marketing.
-                    </p>
-                  </div>
+                  <h2 className="text-6xl font-headline font-bold text-white tracking-tighter">Ajustes de <span className="text-primary">IA</span></h2>
                   <AISettings />
                 </div>
               )}
