@@ -14,7 +14,12 @@ const MarketingPlanInputSchema = z.object({
   industry: z.string().describe('The industry the business operates in.'),
   targetAudience: z.string().describe('Detailed description of the target audience.'),
   budget: z.string().describe('The monthly or campaign budget.'),
-  objectives: z.string().describe('Primary objectives (e.g., brand awareness, conversion, loyalty).'),
+  objectives: z.string().describe('Primary objectives.'),
+  // Optional user-provided config
+  userConfig: z.object({
+    modelId: z.string().optional(),
+    apiKey: z.string().optional(),
+  }).optional(),
 });
 export type MarketingPlanInput = z.infer<typeof MarketingPlanInputSchema>;
 
@@ -67,7 +72,12 @@ const generateMarketingPlanFlow = ai.defineFlow(
     outputSchema: MarketingPlanOutputSchema,
   },
   async (input) => {
-    const { output } = await prompt(input);
+    // Note: In a production environment, you would use input.userConfig?.apiKey
+    // to initialize a separate Genkit instance or override the model provider.
+    // For this prototype, we'll use the default instance but respect the model selection if possible.
+    const { output } = await prompt(input, {
+      model: input.userConfig?.modelId || 'googleai/gemini-1.5-flash',
+    });
     if (!output) throw new Error('Failed to generate marketing plan');
     return output;
   }

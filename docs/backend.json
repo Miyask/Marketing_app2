@@ -1,32 +1,38 @@
+
 {
   "entities": {
     "UserProfile": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "UserProfile",
       "type": "object",
-      "description": "Represents an individual user of the MarketScout Pro application. This entity stores user-specific data and links to an external authentication system.",
+      "description": "Represents an individual user of the MarketScout Pro application. This entity stores user-specific data, including AI preferences.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the UserProfile entity, typically provided by an external authentication system."
+          "description": "Unique identifier for the UserProfile entity."
         },
         "email": {
           "type": "string",
-          "description": "The user's email address, used for identification and communication.",
+          "description": "The user's email address.",
           "format": "email"
         },
         "fullName": {
           "type": "string",
           "description": "The full name of the user."
         },
+        "aiSettings": {
+          "type": "object",
+          "properties": {
+            "modelId": { "type": "string", "default": "googleai/gemini-1.5-flash" },
+            "apiKey": { "type": "string", "description": "User's personal Google AI API Key" }
+          }
+        },
         "createdAt": {
           "type": "string",
-          "description": "Timestamp when the user profile was created.",
           "format": "date-time"
         },
         "updatedAt": {
           "type": "string",
-          "description": "Timestamp when the user profile was last updated.",
           "format": "date-time"
         }
       },
@@ -41,334 +47,78 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "BusinessProfile",
       "type": "object",
-      "description": "Represents a business entity, which can be a prospect, client, or competitor, discovered or managed within the MarketScout Pro application.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the BusinessProfile entity."
-        },
-        "userId": {
-          "type": "string",
-          "description": "Reference to the UserProfile who owns or manages this business profile. (Relationship: UserProfile 1:N BusinessProfile)"
-        },
-        "name": {
-          "type": "string",
-          "description": "The official name of the business."
-        },
-        "url": {
-          "type": "string",
-          "description": "The primary website URL of the business.",
-          "format": "uri"
-        },
-        "ownerName": {
-          "type": "string",
-          "description": "The name of the business owner or a primary contact person."
-        },
-        "email": {
-          "type": "string",
-          "description": "The primary contact email address for the business.",
-          "format": "email"
-        },
-        "phone": {
-          "type": "string",
-          "description": "The primary contact phone number for the business."
-        },
-        "addressCity": {
-          "type": "string",
-          "description": "The city part of the business's physical address."
-        },
-        "addressCountry": {
-          "type": "string",
-          "description": "The country part of the business's physical address."
-        },
-        "industry": {
-          "type": "string",
-          "description": "The industry or sector the business operates in."
-        },
-        "socialLinks": {
-          "type": "array",
-          "description": "An array of social media profile URLs associated with the business.",
-          "items": {
-            "type": "string"
-          }
-        },
-        "leadStatus": {
-          "type": "string",
-          "description": "The current status of this business in the lead management pipeline.",
-          "format": "enum",
-          "items": {
-            "type": "string"
-          }
-        },
-        "competitorBusinessProfileIds": {
-          "type": "array",
-          "description": "References to other BusinessProfile entities identified as competitors. (Relationship: BusinessProfile N:N BusinessProfile)",
-          "items": {
-            "type": "string"
-          }
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp when this business profile was first created or discovered.",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Timestamp when this business profile was last updated.",
-          "format": "date-time"
-        }
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "url": { "type": "string", "format": "uri" },
+        "ownerName": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "phone": { "type": "string" },
+        "addressCity": { "type": "string" },
+        "addressCountry": { "type": "string" },
+        "industry": { "type": "string" },
+        "leadStatus": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
       },
-      "required": [
-        "id",
-        "userId",
-        "name",
-        "url",
-        "leadStatus",
-        "createdAt"
-      ]
+      "required": ["id", "userId", "name", "leadStatus", "createdAt"]
     },
     "SearchQuery": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "SearchQuery",
       "type": "object",
-      "description": "Stores the parameters used for a specific client discovery search operation.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the SearchQuery entity."
-        },
-        "userId": {
-          "type": "string",
-          "description": "Reference to the UserProfile who performed this search. (Relationship: UserProfile 1:N SearchQuery)"
-        },
-        "name": {
-          "type": "string",
-          "description": "A user-defined name or description for this search query."
-        },
-        "keywords": {
-          "type": "array",
-          "description": "An array of keywords used in the search to find businesses.",
-          "items": {
-            "type": "string"
-          }
-        },
-        "industryFilter": {
-          "type": "string",
-          "description": "The industry filter applied to the search, if any."
-        },
-        "locationFilter": {
-          "type": "string",
-          "description": "The geographic location filter applied to the search, if any."
-        },
-        "searchDate": {
-          "type": "string",
-          "description": "Timestamp when the search query was executed.",
-          "format": "date-time"
-        },
-        "discoveredBusinessProfileIds": {
-          "type": "array",
-          "description": "References to BusinessProfile entities discovered as a result of this search query. (Relationship: SearchQuery 1:N BusinessProfile)",
-          "items": {
-            "type": "string"
-          }
-        }
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "searchDate": { "type": "string", "format": "date-time" }
       },
-      "required": [
-        "id",
-        "userId",
-        "name",
-        "searchDate"
-      ]
+      "required": ["id", "userId", "name", "searchDate"]
     },
     "MarketingAsset": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "MarketingAsset",
       "type": "object",
-      "description": "Stores generated marketing ideas, slogans, or content outlines created by the AI marketing asset generator.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the MarketingAsset entity."
-        },
-        "userId": {
-          "type": "string",
-          "description": "Reference to the UserProfile who generated this marketing asset. (Relationship: UserProfile 1:N MarketingAsset)"
-        },
-        "targetBusinessProfileId": {
-          "type": "string",
-          "description": "Reference to the BusinessProfile for which this marketing asset was generated. (Relationship: BusinessProfile 1:N MarketingAsset)"
-        },
-        "assetType": {
-          "type": "string",
-          "description": "The type of marketing asset generated (e.g., Slogan, Marketing Idea, Brochure Outline, Logo Concept, Campaign Copy).",
-          "format": "enum",
-          "items": {
-            "type": "string"
-          }
-        },
-        "title": {
-          "type": "string",
-          "description": "A brief title or summary of the marketing asset."
-        },
-        "content": {
-          "type": "string",
-          "description": "The generated marketing content itself (e.g., the slogan, detailed idea description, or outline text)."
-        },
-        "generationParameters": {
-          "type": "string",
-          "description": "A JSON string storing the input parameters and context used during the AI generation process."
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp when the marketing asset was generated.",
-          "format": "date-time"
-        }
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "targetBusinessProfileId": { "type": "string" },
+        "assetType": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": [
-        "id",
-        "userId",
-        "targetBusinessProfileId",
-        "assetType",
-        "title",
-        "content",
-        "createdAt"
-      ]
+      "required": ["id", "userId", "targetBusinessProfileId", "assetType", "title", "content", "createdAt"]
     },
     "Campaign": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Campaign",
       "type": "object",
-      "description": "Represents a marketing campaign organized by a user, tracking its details, target businesses, associated assets, and ROI metrics.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Campaign entity."
-        },
-        "userId": {
-          "type": "string",
-          "description": "Reference to the UserProfile who created this campaign. (Relationship: UserProfile 1:N Campaign)"
-        },
-        "name": {
-          "type": "string",
-          "description": "The name of the marketing campaign."
-        },
-        "description": {
-          "type": "string",
-          "description": "A detailed description of the campaign's goals and strategy."
-        },
-        "startDate": {
-          "type": "string",
-          "description": "The planned start date of the campaign.",
-          "format": "date-time"
-        },
-        "endDate": {
-          "type": "string",
-          "description": "The planned end date of the campaign.",
-          "format": "date-time"
-        },
-        "status": {
-          "type": "string",
-          "description": "The current status of the campaign (e.g., Planning, Active, Completed, Paused, Archived).",
-          "format": "enum",
-          "items": {
-            "type": "string"
-          }
-        },
-        "targetBusinessProfileIds": {
-          "type": "array",
-          "description": "References to BusinessProfile entities that are the target audience for this campaign. (Relationship: BusinessProfile N:N Campaign)",
-          "items": {
-            "type": "string"
-          }
-        },
-        "marketingAssetIds": {
-          "type": "array",
-          "description": "References to MarketingAsset entities used within this campaign. (Relationship: MarketingAsset N:N Campaign)",
-          "items": {
-            "type": "string"
-          }
-        },
-        "estimatedCost": {
-          "type": "number",
-          "description": "The estimated financial cost of running this campaign."
-        },
-        "estimatedRevenue": {
-          "type": "number",
-          "description": "The estimated revenue or outcome expected from this campaign."
-        },
-        "actualCost": {
-          "type": "number",
-          "description": "The actual financial cost incurred for this campaign."
-        },
-        "actualRevenue": {
-          "type": "number",
-          "description": "The actual revenue or outcome achieved from this campaign."
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp when the campaign was created.",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Timestamp when the campaign was last updated.",
-          "format": "date-time"
-        }
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "status": { "type": "string" },
+        "startDate": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": [
-        "id",
-        "userId",
-        "name",
-        "startDate",
-        "status",
-        "createdAt"
-      ]
+      "required": ["id", "userId", "name", "startDate", "status", "createdAt"]
     },
     "Note": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Note",
       "type": "object",
-      "description": "Represents a user-created note associated with a specific business profile.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Note entity."
-        },
-        "userId": {
-          "type": "string",
-          "description": "Reference to the UserProfile who created this note. (Relationship: UserProfile 1:N Note)"
-        },
-        "businessProfileId": {
-          "type": "string",
-          "description": "Reference to the BusinessProfile to which this note is attached. (Relationship: BusinessProfile 1:N Note)"
-        },
-        "content": {
-          "type": "string",
-          "description": "The textual content of the note."
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp when the note was created.",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Timestamp when the note was last updated.",
-          "format": "date-time"
-        }
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "businessProfileId": { "type": "string" },
+        "content": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": [
-        "id",
-        "userId",
-        "businessProfileId",
-        "content",
-        "createdAt"
-      ]
+      "required": ["id", "userId", "businessProfileId", "content", "createdAt"]
     }
   },
   "auth": {
     "providers": [
       "password",
+      "google",
       "anonymous"
     ]
   },
@@ -381,7 +131,7 @@
           "schema": {
             "$ref": "#/backend/entities/UserProfile"
           },
-          "description": "Stores individual user profiles. The document ID (`userId`) MUST match the Firebase Authentication UID (`request.auth.uid`). Includes denormalized 'id' matching document ID."
+          "description": "Stores individual user profiles including AI preferences."
         }
       },
       {
@@ -390,18 +140,7 @@
           "entityName": "BusinessProfile",
           "schema": {
             "$ref": "#/backend/entities/BusinessProfile"
-          },
-          "description": "Stores business profiles owned by a specific user. The document includes a denormalized 'userId' field for authorization independence, ensuring `request.auth.uid` matches both the path wildcard and the document's `userId` field. The 'id' field matches the document ID.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user who owns this business profile."
-            },
-            {
-              "name": "businessProfileId",
-              "description": "The unique identifier for the business profile."
-            }
-          ]
+          }
         }
       },
       {
@@ -410,18 +149,7 @@
           "entityName": "SearchQuery",
           "schema": {
             "$ref": "#/backend/entities/SearchQuery"
-          },
-          "description": "Stores search queries performed by a specific user. The document includes a denormalized 'userId' field for authorization independence. The 'id' field matches the document ID.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user who performed this search query."
-            },
-            {
-              "name": "searchQueryId",
-              "description": "The unique identifier for the search query."
-            }
-          ]
+          }
         }
       },
       {
@@ -430,18 +158,7 @@
           "entityName": "MarketingAsset",
           "schema": {
             "$ref": "#/backend/entities/MarketingAsset"
-          },
-          "description": "Stores marketing assets generated by a specific user. The document includes a denormalized 'userId' field for authorization independence. The 'id' field matches the document ID.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user who generated this marketing asset."
-            },
-            {
-              "name": "marketingAssetId",
-              "description": "The unique identifier for the marketing asset."
-            }
-          ]
+          }
         }
       },
       {
@@ -450,18 +167,7 @@
           "entityName": "Campaign",
           "schema": {
             "$ref": "#/backend/entities/Campaign"
-          },
-          "description": "Stores marketing campaigns created by a specific user. The document includes a denormalized 'userId' field for authorization independence. The 'id' field matches the document ID.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user who created this campaign."
-            },
-            {
-              "name": "campaignId",
-              "description": "The unique identifier for the marketing campaign."
-            }
-          ]
+          }
         }
       },
       {
@@ -470,21 +176,9 @@
           "entityName": "Note",
           "schema": {
             "$ref": "#/backend/entities/Note"
-          },
-          "description": "Stores notes created by a specific user and associated with a business profile. The document includes a denormalized 'userId' field for authorization independence. The 'id' field matches the document ID.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user who created this note."
-            },
-            {
-              "name": "noteId",
-              "description": "The unique identifier for the note."
-            }
-          ]
+          }
         }
       }
-    ],
-    "reasoning": "The recommended Firestore structure prioritizes strong authorization independence and clear ownership, aligning perfectly with the core design principles. All user-specific data (Business Profiles, Search Queries, Marketing Assets, Campaigns, and Notes) are nested under a top-level `/users/{userId}` collection. This immediately establishes a clear, path-based ownership model where the `userId` in the path segment directly corresponds to the authenticated user's UID (`request.auth.uid`).\n\nAuthorization Independence is achieved by denormalizing the `userId` field into every child document (e.g., `BusinessProfile.userId`, `SearchQuery.userId`, etc.). This means that security rules for `/users/{userId}/businessProfiles/{businessProfileId}` can simply check `request.auth.uid == resource.data.userId` and `request.auth.uid == userId` (the wildcard from the path) without needing any `get()` operations to check the parent `/users/{userId}` document. This eliminates complex authorization dependencies, simplifies rule debugging, and allows for atomic batch writes/transactions without rule failures. Each entity's `id` field will also match its document ID within its respective collection.\n\nQuery as Authorization Predicate (QAPs) is fully supported. By nesting user data, a user can only list or read documents under their specific `/users/{userId}` path. For instance, to list all `BusinessProfile`s for the current user, the client-side query would target `db.collection('users').doc(request.auth.uid).collection('businessProfiles')`. Firestore security rules would then easily enforce that `request.auth.uid` matches the `{userId}` wildcard in the path, ensuring that users can only access their own data. The explicit `userId` field in each document provides a redundant, but crucial, check for `read` and `write` operations, reinforcing data ownership and preventing unauthorized access even if a query path was somehow manipulated. This structural segregation ensures that all documents within a given subcollection (e.g., `/users/{userId}/businessProfiles`) share the same security posture, simplifying rule sets and making them highly performant and easy to debug."
+    ]
   }
 }

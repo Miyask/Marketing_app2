@@ -15,7 +15,8 @@ import {
   LogOut,
   Sparkles,
   TrendingUp,
-  Loader2
+  Loader2,
+  Cpu
 } from "lucide-react";
 import {
   Sidebar,
@@ -40,6 +41,7 @@ import { PlanGenerator } from "@/components/marketing/plan-generator";
 import { AssetGenerator } from "@/components/marketing/asset-generator";
 import { LeadList } from "@/components/leads/lead-list";
 import { RoiCalculator } from "@/components/roi/roi-calculator";
+import { AISettings } from "@/components/settings/ai-settings";
 
 export default function MarketScoutDashboard() {
   const { user, isUserLoading } = useUser();
@@ -132,6 +134,24 @@ export default function MarketScoutDashboard() {
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
+
+            <SidebarGroup>
+              <SidebarGroupLabel className="text-muted-foreground/30 px-4 text-[10px] tracking-widest uppercase font-bold mb-2">Configuración</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton 
+                      isActive={activeTab === "settings"} 
+                      onClick={() => setActiveTab("settings")} 
+                      className="h-12 rounded-xl data-[active=true]:bg-primary data-[active=true]:text-white"
+                    >
+                      <Cpu className="w-4 h-4" />
+                      <span className="font-medium">Ajustes de IA</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
           </SidebarContent>
           <SidebarFooter className="p-6">
             <div className="glass-card p-4 rounded-2xl space-y-4">
@@ -146,7 +166,12 @@ export default function MarketScoutDashboard() {
                   </button>
                 </div>
               </div>
-              <Button variant="outline" size="sm" className="w-full h-8 text-[9px] font-bold border-white/10 hover:bg-white/5 uppercase tracking-widest">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full h-8 text-[9px] font-bold border-white/10 hover:bg-white/5 uppercase tracking-widest"
+                onClick={() => setActiveTab("settings")}
+              >
                 <Settings className="w-3 h-3 mr-1" /> Preferencias
               </Button>
             </div>
@@ -211,6 +236,21 @@ export default function MarketScoutDashboard() {
                 <div className="space-y-10">
                   <h2 className="text-6xl font-headline font-bold text-white tracking-tighter">Proyección de <span className="text-primary">Impacto</span></h2>
                   <RoiCalculator />
+                </div>
+              )}
+
+              {activeTab === "settings" && (
+                <div className="space-y-10">
+                  <div className="flex flex-col gap-6">
+                    <div className="flex items-center gap-3 text-primary font-bold text-xs tracking-[0.4em] uppercase">
+                      <Cpu className="w-4 h-4" /> Personalización Tecnológica
+                    </div>
+                    <h2 className="text-6xl font-headline font-bold text-white tracking-tighter">Ajustes de <span className="text-primary">IA</span></h2>
+                    <p className="text-muted-foreground text-xl max-w-2xl leading-relaxed">
+                      Configura tus propias API Keys y elige el cerebro que impulsará tus estrategias de marketing.
+                    </p>
+                  </div>
+                  <AISettings />
                 </div>
               )}
             </div>

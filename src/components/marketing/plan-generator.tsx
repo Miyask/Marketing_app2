@@ -2,8 +2,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { Sparkles, Loader2, Target, Calendar, BarChart, ShieldAlert, CheckCircle2, Layout, FileText, ChevronRight } from "lucide-react";
+import { Sparkles, Loader2, Target, Calendar, BarChart, ShieldAlert, CheckCircle2, Layout, FileText, ChevronRight, Cpu } from "lucide-react";
 import { generateMarketingPlan, type MarketingPlanOutput } from "@/ai/flows/generate-marketing-plan-flow";
+import { useUser, useFirestore, useDoc, useMemoFirebase } from "@/firebase";
+import { doc } from "firebase/firestore";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -12,25 +14,46 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 
 export function PlanGenerator() {
+  const { user } = useUser();
+  const db = useFirestore();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [plan, setPlan] = useState<MarketingPlanOutput | null>(null);
+
+  const userRef = useMemoFirebase(() => {
+    if (!db || !user?.uid) return null;
+    return doc(db, "users", user.uid);
+  }, [db, user?.uid]);
+  const { data: profile } = useDoc(userRef);
+
   const [formData, setFormData] = useState({
     businessName: "EcoBoost Solar Solutions",
     industry: "Energía Renovable B2B",
-    targetAudience: "Gerentes de naves industriales interesados en ahorro energético y sostenibilidad.",
+    targetAudience: "Gerentes de naves industriales interesados en ahorro energético.",
     budget: "1.500€ - 3.000€ mensuales",
     objectives: "Conseguir 20 reuniones cualificadas con directores de planta al mes."
   });
 
   const handleGenerate = async () => {
+    if (profile?.aiSettings?.apiKey === "") {
+      toast({ 
+        title: "API Key requerida", 
+        description: "Por favor, configura tu API Key en Ajustes de IA para continuar.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setLoading(true);
     try {
-      const result = await generateMarketingPlan(formData);
+      const result = await generateMarketingPlan({
+        ...formData,
+        userConfig: profile?.aiSettings
+      });
       setPlan(result);
       toast({ title: "¡Estrategia Generada!", description: "He analizado tu sector y creado un plan maestro." });
     } catch (error) {
-      toast({ title: "Error", description: "La IA está ocupada. Inténtalo de nuevo.", variant: "destructive" });
+      toast({ title: "Error", description: "La IA está ocupada o tu clave es inválida.", variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -44,7 +67,7 @@ export function PlanGenerator() {
           <CardTitle className="text-xl flex items-center gap-2 text-white">
             <Target className="w-5 h-5 text-primary" /> Parámetros
           </CardTitle>
-          <CardDescription>Datos pre-cargados para que pruebes ahora mismo.</CardDescription>
+          <CardDescription>Define tu negocio para la IA.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6 pt-0">
           <div className="space-y-2">
@@ -59,9 +82,18 @@ export function PlanGenerator() {
             <label className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Objetivos</label>
             <Textarea value={formData.objectives} onChange={(e) => setFormData({...formData, objectives: e.target.value})} placeholder="Metas" className="min-h-[100px] bg-white/5 border-white/10" />
           </div>
+
+          <div className="p-3 rounded-xl bg-primary/5 border border-primary/10 flex items-center gap-3">
+            <Cpu className="w-4 h-4 text-primary" />
+            <div className="flex-1 overflow-hidden">
+              <p className="text-[8px] font-bold uppercase text-muted-foreground">Motor Activo</p>
+              <p className="text-[10px] font-medium text-white truncate">{profile?.aiSettings?.modelId?.split('/').pop() || "Gemini Flash"}</p>
+            </div>
+          </div>
+
           <Button className="w-full bg-primary hover:bg-primary/90 text-white h-14 text-lg font-headline font-bold glow-primary" onClick={handleGenerate} disabled={loading}>
             {loading ? <Loader2 className="w-6 h-6 animate-spin mr-2" /> : <Sparkles className="w-6 h-6 mr-2" />}
-            {loading ? "Calculando..." : "Generar Plan Ahora"}
+            {loading ? "Pensando..." : "Generar Plan Ahora"}
           </Button>
         </CardContent>
       </Card>
@@ -74,7 +106,7 @@ export function PlanGenerator() {
             </div>
             <h3 className="text-3xl font-headline font-bold text-white mb-4">Motor de Estrategia AI</h3>
             <p className="text-muted-foreground max-w-md text-lg leading-relaxed">
-              Pulsa el botón de la izquierda para ver cómo la IA diseña una estrategia de 360 grados para el ejemplo.
+              Configura tu API Key en ajustes y pulsa generar para ver tu plan maestro de 360 grados.
             </p>
           </div>
         )}
@@ -87,7 +119,7 @@ export function PlanGenerator() {
             </div>
             <div className="text-center">
               <p className="text-xl font-headline font-bold text-white">Analizando Oportunidades</p>
-              <p className="text-muted-foreground animate-pulse">Escaneando competidores y tendencias del sector...</p>
+              <p className="text-muted-foreground animate-pulse">Usando tu configuración personalizada...</p>
             </div>
           </div>
         )}
@@ -108,8 +140,8 @@ export function PlanGenerator() {
                       <p className="text-3xl font-headline font-bold">{plan.estimatedRoi}</p>
                    </div>
                    <div className="bg-white/10 backdrop-blur-md px-6 py-4 rounded-2xl border border-white/20">
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-white/60 mb-1">Confianza IA</p>
-                      <p className="text-3xl font-headline font-bold">98%</p>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-white/60 mb-1">Cerebro AI</p>
+                      <p className="text-xl font-headline font-bold uppercase">{profile?.aiSettings?.modelId?.split('-').pop()}</p>
                    </div>
                 </div>
               </div>
