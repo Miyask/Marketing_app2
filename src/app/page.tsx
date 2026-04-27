@@ -49,28 +49,20 @@ export default function MarketScoutDashboard() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("strategy");
 
+  // Eliminamos la redirección forzada para permitir ver la página directamente
+  /*
   useEffect(() => {
     if (!isUserLoading && !user) {
       router.push("/auth");
     }
   }, [user, isUserLoading, router]);
+  */
 
   const handleSignOut = async () => {
     if (auth) await signOut(auth);
   };
 
-  if (isUserLoading) return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#02040a] space-y-4">
-      <div className="relative">
-        <Loader2 className="w-16 h-16 animate-spin text-primary" />
-        <Target className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-7 h-7 text-primary" />
-      </div>
-      <p className="text-xs font-headline font-bold text-primary animate-pulse tracking-[0.3em] uppercase">Sincronizando Sistema</p>
-    </div>
-  );
-
-  if (!user) return null;
-
+  // Renderizamos el dashboard directamente, ignorando si está cargando el usuario para no bloquear la vista
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="flex min-h-screen w-full overflow-hidden bg-[#02040a]">
