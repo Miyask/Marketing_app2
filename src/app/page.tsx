@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState } from "react";
@@ -117,7 +118,7 @@ export default function MarketScoutDashboard() {
                   <SidebarMenuItem>
                     <SidebarMenuButton isActive={activeTab === "extractor"} onClick={() => setActiveTab("extractor")} className="h-12 rounded-2xl px-5 hover:bg-primary/5 hover:text-primary transition-colors">
                       <Globe className="w-5 h-5" />
-                      <span className="font-semibold text-sm ml-2">Scouting Digital</span>
+                      <span className="font-semibold text-sm ml-2">Digital Scouting</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </SidebarMenu>
@@ -202,7 +203,7 @@ export default function MarketScoutDashboard() {
             </div>
           </header>
 
-          <main className="p-12 lg:p-20 max-w-[1400px] mx-auto w-full">
+          <main className="p-8 lg:p-16 xl:p-20 max-w-[1600px] mx-auto w-full">
             <div className="animate-fade-in space-y-16">
               {activeTab === "strategy" && (
                 <div className="space-y-16">
@@ -210,7 +211,7 @@ export default function MarketScoutDashboard() {
                     <div className="flex items-center gap-3 text-primary text-[10px] font-bold tracking-[0.3em] uppercase bg-primary/5 w-fit px-4 py-1.5 rounded-full">
                       <TrendingUp className="w-3.5 h-3.5" /> Core Estratégico
                     </div>
-                    <h2 className="text-7xl lg:text-8xl font-headline font-bold text-foreground tracking-tighter leading-[0.9] max-w-4xl">
+                    <h2 className="text-6xl lg:text-7xl xl:text-8xl font-headline font-bold text-foreground tracking-tighter leading-[0.9] max-w-4xl">
                       Diseña tu próximo <br/><span className="text-primary">Salto Maestro</span>.
                     </h2>
                     <p className="text-xl text-muted-foreground/80 max-w-2xl leading-relaxed font-medium">
@@ -227,7 +228,7 @@ export default function MarketScoutDashboard() {
                     <div className="flex items-center gap-3 text-accent text-[10px] font-bold tracking-[0.3em] uppercase bg-accent/5 w-fit px-4 py-1.5 rounded-full">
                       <Zap className="w-3.5 h-3.5" /> Creative Engine
                     </div>
-                    <h2 className="text-7xl lg:text-8xl font-headline font-bold text-foreground tracking-tighter leading-[0.9]">
+                    <h2 className="text-6xl lg:text-7xl xl:text-8xl font-headline font-bold text-foreground tracking-tighter leading-[0.9]">
                       Identidad de <br/><span className="text-accent">Alto Impacto</span>.
                     </h2>
                   </div>
@@ -241,7 +242,7 @@ export default function MarketScoutDashboard() {
                     <div className="flex items-center gap-3 text-primary text-[10px] font-bold tracking-[0.3em] uppercase bg-primary/5 w-fit px-4 py-1.5 rounded-full">
                       <Search className="w-3.5 h-3.5" /> Market Discovery
                     </div>
-                    <h2 className="text-7xl lg:text-8xl font-headline font-bold text-foreground tracking-tighter leading-[0.9]">
+                    <h2 className="text-6xl lg:text-7xl xl:text-8xl font-headline font-bold text-foreground tracking-tighter leading-[0.9]">
                       Encuentra tus <br/><span className="text-primary">Oportunidades</span>.
                     </h2>
                   </div>
@@ -251,11 +252,11 @@ export default function MarketScoutDashboard() {
 
               {activeTab === "extractor" && (
                 <div className="space-y-16">
-                  <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-4 text-center items-center">
                     <div className="flex items-center gap-3 text-accent text-[10px] font-bold tracking-[0.3em] uppercase bg-accent/5 w-fit px-4 py-1.5 rounded-full">
                       <Globe className="w-3.5 h-3.5" /> Scouting Digital
                     </div>
-                    <h2 className="text-7xl lg:text-8xl font-headline font-bold text-foreground tracking-tighter leading-[0.9]">
+                    <h2 className="text-6xl lg:text-7xl xl:text-8xl font-headline font-bold text-foreground tracking-tighter leading-[0.9]">
                       Extracción de <br/><span className="text-accent">Perfiles Web</span>.
                     </h2>
                   </div>
@@ -265,7 +266,7 @@ export default function MarketScoutDashboard() {
 
               {activeTab === "leads" && (
                 <div className="space-y-12">
-                  <h2 className="text-7xl font-headline font-bold text-foreground tracking-tighter leading-none">
+                  <h2 className="text-6xl font-headline font-bold text-foreground tracking-tighter leading-none">
                     Pipeline de <span className="text-primary">Ventas</span>.
                   </h2>
                   <div className="bg-white/80 backdrop-blur-sm border border-border/50 rounded-[3rem] p-12 shadow-xl">
@@ -276,7 +277,7 @@ export default function MarketScoutDashboard() {
 
               {activeTab === "roi" && (
                 <div className="space-y-16">
-                  <h2 className="text-7xl font-headline font-bold text-foreground tracking-tighter leading-[0.9]">
+                  <h2 className="text-6xl lg:text-7xl font-headline font-bold text-foreground tracking-tighter leading-[0.9]">
                     Simulador <span className="text-primary">ROI 360°</span>.
                   </h2>
                   <RoiCalculator />
@@ -285,7 +286,7 @@ export default function MarketScoutDashboard() {
 
               {activeTab === "settings" && (
                 <div className="space-y-16">
-                  <h2 className="text-7xl font-headline font-bold text-foreground tracking-tighter leading-[0.9]">
+                  <h2 className="text-6xl lg:text-7xl font-headline font-bold text-foreground tracking-tighter leading-[0.9]">
                     Ajustes de <span className="text-primary">Inteligencia</span>.
                   </h2>
                   <AISettings />
