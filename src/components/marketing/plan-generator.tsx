@@ -52,7 +52,7 @@ export function PlanGenerator() {
   return (
     <div className="grid grid-cols-1 xl:grid-cols-12 gap-12 items-start">
       <Card className="xl:col-span-4 glass-card border-none rounded-[2.5rem] overflow-hidden shadow-2xl">
-        <div className="h-2 bg-gradient-to-r from-primary via-indigo-500 to-accent" />
+        <div className="h-2 bg-gradient-to-r from-primary via-accent to-accent" />
         <CardHeader className="p-10 pb-6">
           <CardTitle className="text-3xl font-headline font-bold text-white flex items-center gap-4">
             <Presentation className="w-8 h-8 text-primary" /> Setup
@@ -122,7 +122,7 @@ export function PlanGenerator() {
 
         {plan && (
           <div className="space-y-10 animate-fade-in pb-20">
-            <Card className="border-none bg-gradient-to-br from-primary via-primary/80 to-indigo-900 text-white overflow-hidden rounded-[3rem] p-12 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] relative group">
+            <Card className="border-none bg-gradient-to-br from-primary via-primary/80 to-accent text-white overflow-hidden rounded-[3rem] p-12 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] relative group">
               <div className="absolute top-0 right-0 p-12 opacity-5 group-hover:opacity-10 transition-opacity">
                 <Sparkles className="w-64 h-64" />
               </div>
@@ -152,25 +152,25 @@ export function PlanGenerator() {
                 </div>
                 <div className="space-y-8">
                   <div className="space-y-4">
-                    <h5 className="text-[10px] font-bold uppercase text-emerald-400 tracking-[0.3em] flex items-center gap-3">
-                      <span className="w-3 h-0.5 bg-emerald-400" /> Fortalezas Clave
+                    <h5 className="text-[10px] font-bold uppercase text-accent tracking-[0.3em] flex items-center gap-3">
+                      <span className="w-3 h-0.5 bg-accent" /> Fortalezas Clave
                     </h5>
                     <div className="grid gap-3">
                       {plan.swotAnalysis.strengths.map((s, i) => (
-                        <div key={i} className="flex items-start gap-4 text-sm text-white/70 bg-white/[0.03] p-4 rounded-2xl border border-white/5 hover:border-emerald-500/30 transition-all">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" /> {s}
+                        <div key={i} className="flex items-start gap-4 text-sm text-white/70 bg-white/[0.03] p-4 rounded-2xl border border-white/5 hover:border-accent/30 transition-all">
+                          <CheckCircle2 className="w-4 h-4 text-accent mt-0.5 shrink-0" /> {s}
                         </div>
                       ))}
                     </div>
                   </div>
                   <div className="space-y-4">
-                    <h5 className="text-[10px] font-bold uppercase text-amber-400 tracking-[0.3em] flex items-center gap-3">
-                      <span className="w-3 h-0.5 bg-amber-400" /> Desafíos de Mercado
+                    <h5 className="text-[10px] font-bold uppercase text-primary tracking-[0.3em] flex items-center gap-3">
+                      <span className="w-3 h-0.5 bg-primary" /> Desafíos de Mercado
                     </h5>
                     <div className="grid gap-3">
                       {plan.swotAnalysis.weaknesses.map((s, i) => (
-                        <div key={i} className="flex items-start gap-4 text-sm text-white/70 bg-white/[0.03] p-4 rounded-2xl border border-white/5 hover:border-amber-500/30 transition-all">
-                          <ChevronRight className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" /> {s}
+                        <div key={i} className="flex items-start gap-4 text-sm text-white/70 bg-white/[0.03] p-4 rounded-2xl border border-white/5 hover:border-primary/30 transition-all">
+                          <ChevronRight className="w-4 h-4 text-primary mt-0.5 shrink-0" /> {s}
                         </div>
                       ))}
                     </div>
@@ -179,7 +179,7 @@ export function PlanGenerator() {
               </Card>
 
               <Card className="glass-card border-none p-10 rounded-[2.5rem]">
-                <div className="flex items-center gap-4 mb-8 text-indigo-400">
+                <div className="flex items-center gap-4 mb-8 text-accent">
                   <Calendar className="w-7 h-7" />
                   <h4 className="text-2xl font-headline font-bold text-white tracking-tight">Roadmap de Ejecución</h4>
                 </div>

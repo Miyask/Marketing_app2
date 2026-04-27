@@ -58,7 +58,7 @@ export default function MarketScoutDashboard() {
 
   return (
     <SidebarProvider defaultOpen={true}>
-      <div className="flex min-h-svh w-full overflow-hidden bg-[#02040a]">
+      <div className="flex min-h-svh w-full overflow-hidden bg-background">
         <Sidebar variant="inset" className="border-r border-white/5 bg-sidebar shadow-2xl">
           <SidebarHeader className="p-8">
             <div className="flex items-center gap-4">
@@ -165,7 +165,7 @@ export default function MarketScoutDashboard() {
         </Sidebar>
 
         <SidebarInset className="flex-1 overflow-auto bg-transparent">
-          <header className="sticky top-0 z-40 flex h-24 items-center gap-4 px-12 border-b border-white/5 bg-[#02040a]/80 backdrop-blur-3xl">
+          <header className="sticky top-0 z-40 flex h-24 items-center gap-4 px-12 border-b border-white/5 bg-background/80 backdrop-blur-3xl">
             <SidebarTrigger className="text-white hover:bg-white/5" />
             <div className="h-8 w-px bg-white/5 mx-2" />
             <div className="flex flex-col">
@@ -184,7 +184,7 @@ export default function MarketScoutDashboard() {
             <div className="flex-1" />
             <div className="flex items-center gap-4">
               <div className="hidden xl:flex items-center gap-2 px-5 py-2 rounded-2xl bg-white/5 border border-white/10 text-white text-[10px] font-bold tracking-[0.2em] uppercase">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" /> API SECURE CONNECTION
+                <ShieldCheck className="w-3.5 h-3.5 text-orange-400" /> API SECURE CONNECTION
               </div>
               <Button 
                 onClick={() => setActiveTab("settings")}
@@ -205,7 +205,7 @@ export default function MarketScoutDashboard() {
                       <TrendingUp className="w-4 h-4" /> Strategic Direction
                     </div>
                     <h2 className="text-7xl font-headline font-bold text-white tracking-tighter leading-[0.9] max-w-4xl">
-                      Diseña tu <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-indigo-400 to-accent">Dominio</span> del Mercado.
+                      Diseña tu <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent/80 to-accent">Dominio</span> del Mercado.
                     </h2>
                     <p className="text-xl text-muted-foreground max-w-2xl leading-relaxed">Generación de planes maestros 360° mediante motores de inteligencia predictiva.</p>
                   </div>
@@ -244,11 +244,11 @@ export default function MarketScoutDashboard() {
               {activeTab === "extractor" && (
                 <div className="space-y-12">
                   <div className="flex flex-col gap-4">
-                    <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold tracking-[0.5em] uppercase px-1">
+                    <div className="flex items-center gap-2 text-accent text-xs font-bold tracking-[0.5em] uppercase px-1">
                       <Globe className="w-4 h-4" /> Digital Intelligence
                     </div>
                     <h2 className="text-7xl font-headline font-bold text-white tracking-tighter leading-[0.9]">
-                      Extracción de <span className="text-emerald-400">Datos Web</span>.
+                      Extracción de <span className="text-accent">Datos Web</span>.
                     </h2>
                   </div>
                   <ProfileExtractor />

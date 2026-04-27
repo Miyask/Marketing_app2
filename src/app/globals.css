@@ -4,34 +4,34 @@
 
 @layer base {
   :root {
-    --background: 224 71% 4%;
-    --foreground: 213 31% 91%;
-    --card: 224 71% 4%;
-    --card-foreground: 213 31% 91%;
-    --popover: 224 71% 4%;
-    --popover-foreground: 213 31% 91%;
-    --primary: 263.4 70% 50.4%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 222.2 47.4% 11.2%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 223 47% 11%;
-    --muted-foreground: 215.4 16.3% 56.9%;
-    --accent: 216 34% 17%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --background: 20 15% 4%;
+    --foreground: 40 10% 90%;
+    --card: 20 15% 6%;
+    --card-foreground: 40 10% 90%;
+    --popover: 20 15% 6%;
+    --popover-foreground: 40 10% 90%;
+    --primary: 24 95% 53%;
+    --primary-foreground: 40 10% 98%;
+    --secondary: 25 20% 12%;
+    --secondary-foreground: 40 10% 98%;
+    --muted: 25 15% 12%;
+    --muted-foreground: 30 10% 60%;
+    --accent: 38 90% 55%;
+    --accent-foreground: 40 10% 98%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
-    --border: 216 34% 17%;
-    --input: 216 34% 17%;
-    --ring: 263.4 70% 50.4%;
-    --radius: 1.25rem;
-    --sidebar-background: 224 71% 2%;
-    --sidebar-foreground: 213 31% 91%;
-    --sidebar-primary: 263.4 70% 50.4%;
+    --border: 25 15% 15%;
+    --input: 25 15% 15%;
+    --ring: 24 95% 53%;
+    --radius: 1.5rem;
+    --sidebar-background: 20 15% 3%;
+    --sidebar-foreground: 40 10% 90%;
+    --sidebar-primary: 24 95% 53%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 216 34% 12%;
-    --sidebar-accent-foreground: 213 31% 91%;
-    --sidebar-border: 216 34% 12%;
-    --sidebar-ring: 263.4 70% 50.4%;
+    --sidebar-accent: 25 20% 10%;
+    --sidebar-accent-foreground: 40 10% 90%;
+    --sidebar-border: 25 15% 10%;
+    --sidebar-ring: 24 95% 53%;
   }
 }
 
@@ -42,8 +42,8 @@
   body {
     @apply bg-background text-foreground;
     background-image: 
-      radial-gradient(at 0% 0%, hsla(263, 70%, 50%, 0.12) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, hsla(180, 70%, 50%, 0.08) 0px, transparent 50%);
+      radial-gradient(at 0% 0%, hsla(24, 95%, 53%, 0.1) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, hsla(38, 90%, 55%, 0.08) 0px, transparent 50%);
     background-attachment: fixed;
   }
   h1, h2, h3, h4, h5, h6 {
@@ -52,16 +52,16 @@
 }
 
 .glass-card {
-  @apply bg-card/40 backdrop-blur-3xl border border-white/5 shadow-[0_8px_32px_0_rgba(0,0,0,0.8)];
+  @apply bg-card/40 backdrop-blur-3xl border border-white/5 shadow-[0_8px_32px_0_rgba(0,0,0,0.6)];
   background-image: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 100%);
 }
 
 .glow-primary {
-  box-shadow: 0 0 30px -5px hsla(263, 70%, 50%, 0.5);
+  box-shadow: 0 0 30px -5px hsla(24, 95%, 53%, 0.4);
 }
 
 .glow-accent {
-  box-shadow: 0 0 30px -5px hsla(180, 70%, 50%, 0.3);
+  box-shadow: 0 0 30px -5px hsla(38, 90%, 55%, 0.3);
 }
 
 @keyframes float {
@@ -84,7 +84,6 @@
   animation: pulse-soft 4s ease-in-out infinite;
 }
 
-/* Custom transitions */
 .transition-slow {
   @apply transition-all duration-700 ease-in-out;
 }

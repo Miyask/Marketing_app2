@@ -90,7 +90,7 @@ export function RoiCalculator() {
             <div className="text-7xl font-headline font-bold text-white tracking-tighter">
               {stats.roi.toFixed(0)}<span className="text-primary">%</span>
             </div>
-            <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs pt-4">
+            <div className="flex items-center gap-2 text-accent font-bold text-xs pt-4">
               <ArrowUpRight className="w-4 h-4" /> Rendimiento Superior al Sector
             </div>
           </div>
@@ -125,24 +125,24 @@ export function RoiCalculator() {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             <div className="space-y-4">
-              <div className="flex items-center gap-3 text-blue-400">
-                <div className="w-2 h-2 rounded-full bg-blue-400" />
+              <div className="flex items-center gap-3 text-orange-400">
+                <div className="w-2 h-2 rounded-full bg-orange-400" />
                 <p className="text-[10px] font-bold uppercase tracking-widest">Revenue Bruto</p>
               </div>
               <p className="text-3xl font-headline font-bold text-white">{stats.revenue.toLocaleString()}€</p>
             </div>
             
             <div className="space-y-4">
-              <div className="flex items-center gap-3 text-orange-400">
-                <div className="w-2 h-2 rounded-full bg-orange-400" />
+              <div className="flex items-center gap-3 text-amber-400">
+                <div className="w-2 h-2 rounded-full bg-amber-400" />
                 <p className="text-[10px] font-bold uppercase tracking-widest">CPA Objetivo</p>
               </div>
               <p className="text-3xl font-headline font-bold text-white">{stats.cpa.toFixed(1)}€</p>
             </div>
             
             <div className="space-y-4">
-              <div className="flex items-center gap-3 text-emerald-400">
-                <div className="w-2 h-2 rounded-full bg-emerald-400" />
+              <div className="flex items-center gap-3 text-primary">
+                <div className="w-2 h-2 rounded-full bg-primary" />
                 <p className="text-[10px] font-bold uppercase tracking-widest">LTV/CAC Ratio</p>
               </div>
               <p className="text-3xl font-headline font-bold text-white">{(valuePerClient / (stats.cpa || 1)).toFixed(1)}x</p>
