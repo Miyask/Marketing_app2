@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState } from "react";
@@ -15,26 +16,21 @@ export function PlanGenerator() {
   const [loading, setLoading] = useState(false);
   const [plan, setPlan] = useState<MarketingPlanOutput | null>(null);
   const [formData, setFormData] = useState({
-    businessName: "",
-    industry: "",
-    targetAudience: "",
-    budget: "",
-    objectives: ""
+    businessName: "EcoBoost Solar Solutions",
+    industry: "Energía Renovable B2B",
+    targetAudience: "Gerentes de naves industriales interesados en ahorro energético y sostenibilidad.",
+    budget: "1.500€ - 3.000€ mensuales",
+    objectives: "Conseguir 20 reuniones cualificadas con directores de planta al mes."
   });
 
   const handleGenerate = async () => {
-    if (!formData.businessName || !formData.industry) {
-      toast({ title: "Datos incompletos", description: "Rellena los campos básicos para continuar.", variant: "destructive" });
-      return;
-    }
-
     setLoading(true);
     try {
       const result = await generateMarketingPlan(formData);
       setPlan(result);
-      toast({ title: "¡Plan Generado!", description: "Tu estrategia de marketing está lista." });
+      toast({ title: "¡Estrategia Generada!", description: "He analizado tu sector y creado un plan maestro." });
     } catch (error) {
-      toast({ title: "Error", description: "No se pudo generar el plan. Inténtalo de nuevo.", variant: "destructive" });
+      toast({ title: "Error", description: "La IA está ocupada. Inténtalo de nuevo.", variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -48,28 +44,24 @@ export function PlanGenerator() {
           <CardTitle className="text-xl flex items-center gap-2 text-white">
             <Target className="w-5 h-5 text-primary" /> Parámetros
           </CardTitle>
-          <CardDescription>Define el ADN de tu negocio.</CardDescription>
+          <CardDescription>Datos pre-cargados para que pruebes ahora mismo.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6 pt-0">
           <div className="space-y-2">
             <label className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Empresa</label>
-            <Input value={formData.businessName} onChange={(e) => setFormData({...formData, businessName: e.target.value})} placeholder="Ej: Blue Horizon Co." className="bg-white/5 border-white/10 h-11" />
+            <Input value={formData.businessName} onChange={(e) => setFormData({...formData, businessName: e.target.value})} placeholder="Nombre" className="bg-white/5 border-white/10 h-11" />
           </div>
           <div className="space-y-2">
             <label className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Sector</label>
-            <Input value={formData.industry} onChange={(e) => setFormData({...formData, industry: e.target.value})} placeholder="Ej: Energía Solar B2B" className="bg-white/5 border-white/10 h-11" />
-          </div>
-          <div className="space-y-2">
-            <label className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Presupuesto</label>
-            <Input value={formData.budget} onChange={(e) => setFormData({...formData, budget: e.target.value})} placeholder="Ej: 500€ - 1000€" className="bg-white/5 border-white/10 h-11" />
+            <Input value={formData.industry} onChange={(e) => setFormData({...formData, industry: e.target.value})} placeholder="Sector" className="bg-white/5 border-white/10 h-11" />
           </div>
           <div className="space-y-2">
             <label className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Objetivos</label>
-            <Textarea value={formData.objectives} onChange={(e) => setFormData({...formData, objectives: e.target.value})} placeholder="Ej: Captar 50 leads..." className="min-h-[100px] bg-white/5 border-white/10" />
+            <Textarea value={formData.objectives} onChange={(e) => setFormData({...formData, objectives: e.target.value})} placeholder="Metas" className="min-h-[100px] bg-white/5 border-white/10" />
           </div>
           <Button className="w-full bg-primary hover:bg-primary/90 text-white h-14 text-lg font-headline font-bold glow-primary" onClick={handleGenerate} disabled={loading}>
             {loading ? <Loader2 className="w-6 h-6 animate-spin mr-2" /> : <Sparkles className="w-6 h-6 mr-2" />}
-            {loading ? "Calculando..." : "Generar Estrategia"}
+            {loading ? "Calculando..." : "Generar Plan Ahora"}
           </Button>
         </CardContent>
       </Card>
@@ -80,9 +72,9 @@ export function PlanGenerator() {
             <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mb-8 border border-primary/20 animate-float">
               <FileText className="w-12 h-12 text-primary opacity-50" />
             </div>
-            <h3 className="text-3xl font-headline font-bold text-white mb-4">El Motor Estratégico</h3>
+            <h3 className="text-3xl font-headline font-bold text-white mb-4">Motor de Estrategia AI</h3>
             <p className="text-muted-foreground max-w-md text-lg leading-relaxed">
-              Introduce los detalles de tu empresa para que nuestra IA especializada en marketing diseñe un plan de 360 grados.
+              Pulsa el botón de la izquierda para ver cómo la IA diseña una estrategia de 360 grados para el ejemplo.
             </p>
           </div>
         )}
@@ -107,7 +99,7 @@ export function PlanGenerator() {
                 <Sparkles className="w-40 h-40" />
               </div>
               <div className="relative z-10">
-                <Badge className="mb-4 bg-white/20 text-white border-none backdrop-blur-md px-4 py-1">STRATEGIC REPORT 2024</Badge>
+                <Badge className="mb-4 bg-white/20 text-white border-none backdrop-blur-md px-4 py-1">ESTRATEGIA GENERADA</Badge>
                 <h3 className="text-5xl font-headline font-bold mb-6 tracking-tighter leading-none">{plan.strategyTitle}</h3>
                 <p className="text-xl text-white/90 leading-relaxed mb-8 max-w-3xl border-l-4 border-white/30 pl-6">{plan.executiveSummary}</p>
                 <div className="flex items-center gap-6">
