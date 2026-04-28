@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Sparkles, Loader2, Calendar, ShieldAlert, CheckCircle2, ChevronRight, Cpu, BarChart3, Presentation, Save, Target, Rocket } from "lucide-react";
 import { generateMarketingPlan, type MarketingPlanOutput } from "@/ai/flows/generate-marketing-plan-flow";
 import { useUser, useFirestore, useDoc, useMemoFirebase } from "@/firebase";
@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
+import { hasDefaultGoogleKey } from "@/ai/check-default-key";
 
 export function PlanGenerator() {
   const { user } = useUser();
@@ -20,12 +21,17 @@ export function PlanGenerator() {
   const [loading, setLoading] = useState(false);
   const [plan, setPlan] = useState<MarketingPlanOutput | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [hasServerKey, setHasServerKey] = useState(false);
 
   const userRef = useMemoFirebase(() => {
     if (!db || !user?.uid) return null;
     return doc(db, "users", user.uid);
   }, [db, user?.uid]);
   const { data: profile } = useDoc(userRef);
+
+  useEffect(() => {
+    hasDefaultGoogleKey().then(setHasServerKey);
+  }, []);
 
   const [formData, setFormData] = useState({
     businessName: "Elite Solar Dynamics",
@@ -36,11 +42,33 @@ export function PlanGenerator() {
   });
 
   const handleGenerate = async () => {
+    const aiSettings = profile?.aiSettings;
+    const modelId = aiSettings?.modelId || 'googleai/gemini-2.0-flash-exp';
+    
+    let hasKey = false;
+    if (modelId.startsWith('googleai/') && (aiSettings?.googleApiKey || hasServerKey)) hasKey = true;
+    else if (modelId.startsWith('openai/') && aiSettings?.openaiApiKey) hasKey = true;
+    else if (modelId.startsWith('openrouter/') && aiSettings?.openrouterApiKey) hasKey = true;
+    
+    if (!hasKey) {
+      toast({ 
+        title: "API Key requerida", 
+        description: "Configura tu API Key en Ajustes de IA para activar el generador de estrategias.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       const result = await generateMarketingPlan({
         ...formData,
-        userConfig: profile?.aiSettings
+        userConfig: {
+          modelId: aiSettings?.modelId || 'googleai/gemini-2.0-flash-exp',
+          googleApiKey: aiSettings?.googleApiKey,
+          openaiApiKey: aiSettings?.openaiApiKey,
+          openrouterApiKey: aiSettings?.openrouterApiKey,
+        }
       });
       setPlan(result);
       toast({ title: "Estrategia Generada", description: "El plan maestro ha sido completado con éxito." });

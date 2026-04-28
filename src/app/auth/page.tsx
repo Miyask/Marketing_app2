@@ -21,7 +21,7 @@ import { Target, Sparkles, UserCircle, ArrowRight, Loader2, ArrowLeft, Lock } fr
 import { useToast } from "@/hooks/use-toast";
 
 export default function AuthPage() {
-  const { auth } = useAuth();
+  const auth = useAuth();
   const { user, isUserLoading } = useUser();
   const db = useFirestore();
   const router = useRouter();

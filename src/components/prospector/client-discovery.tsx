@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Search, MapPin, Briefcase, Filter, Download, Star, ExternalLink, Loader2, Sparkles, Info, PlusCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ import { doc, collection, serverTimestamp } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
+import { hasDefaultGoogleKey } from "@/ai/check-default-key";
 
 export function ClientDiscovery() {
   const { user } = useUser();
@@ -23,6 +24,7 @@ export function ClientDiscovery() {
   const [isSearching, setIsSearching] = useState(false);
   const [results, setResults] = useState<DiscoverClientsOutput | null>(null);
   const [isSavingId, setIsSavingId] = useState<number | null>(null);
+  const [hasServerKey, setHasServerKey] = useState(false);
   const [params, setParams] = useState({
     sector: "Clínicas Estéticas",
     location: "Valencia"
@@ -34,13 +36,16 @@ export function ClientDiscovery() {
   }, [db, user?.uid]);
   const { data: profile } = useDoc(userRef);
 
+  useEffect(() => {
+    hasDefaultGoogleKey().then(setHasServerKey);
+  }, []);
+
   const handleSearch = async () => {
     const aiSettings = profile?.aiSettings;
-    const modelId = aiSettings?.modelId || '';
+    const modelId = aiSettings?.modelId || 'googleai/gemini-2.0-flash-exp';
     
-    // Check if appropriate API key exists for the selected model
     let hasKey = false;
-    if (modelId.startsWith('googleai/') && aiSettings?.googleApiKey) hasKey = true;
+    if (modelId.startsWith('googleai/') && (aiSettings?.googleApiKey || hasServerKey)) hasKey = true;
     else if (modelId.startsWith('openai/') && aiSettings?.openaiApiKey) hasKey = true;
     else if (modelId.startsWith('openrouter/') && aiSettings?.openrouterApiKey) hasKey = true;
     
@@ -57,7 +62,12 @@ export function ClientDiscovery() {
     try {
       const data = await discoverClients({
         ...params,
-        userConfig: profile.aiSettings
+        userConfig: {
+          modelId: aiSettings?.modelId || 'googleai/gemini-2.0-flash-exp',
+          googleApiKey: aiSettings?.googleApiKey,
+          openaiApiKey: aiSettings?.openaiApiKey,
+          openrouterApiKey: aiSettings?.openrouterApiKey,
+        }
       });
       setResults(data);
       toast({ title: "Escaneo completado", description: `He encontrado ${data.leads.length} oportunidades clave.` });
