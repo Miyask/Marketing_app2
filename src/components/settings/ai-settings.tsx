@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { Cpu, Loader2, Save, Settings2, CheckCircle2, ExternalLink, Lightbulb, TestTube, Zap, Bot, ShieldCheck } from "lucide-react";
+import { Cpu, Loader2, Save, Settings2, CheckCircle2, ExternalLink, Lightbulb, TestTube, Zap, Bot, ShieldCheck, Sparkles } from "lucide-react";
 import { useUser, useFirestore, useDoc, useMemoFirebase } from "@/firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { hasDefaultGoogleKey } from "@/ai/check-default-key";
 
 export function AISettings() {
   const { user } = useUser();
@@ -19,6 +20,11 @@ export function AISettings() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [testing, setTesting] = useState(false);
+  const [hasServerKey, setHasServerKey] = useState(false);
+
+  useEffect(() => {
+    hasDefaultGoogleKey().then(setHasServerKey);
+  }, []);
 
   const userRef = useMemoFirebase(() => {
     if (!db || !user?.uid) return null;
@@ -28,7 +34,7 @@ export function AISettings() {
   const { data: profile } = useDoc(userRef);
 
   const [settings, setSettings] = useState({
-    modelId: "googleai/gemini-2.0-flash-exp",
+    modelId: "googleai/gemini-2.5-flash",
     googleApiKey: "",
     openaiApiKey: "",
     openrouterApiKey: "",
@@ -37,7 +43,7 @@ export function AISettings() {
   useEffect(() => {
     if (profile?.aiSettings) {
       setSettings({
-        modelId: profile.aiSettings.modelId || "googleai/gemini-2.0-flash-exp",
+        modelId: profile.aiSettings.modelId || "googleai/gemini-2.5-flash",
         googleApiKey: profile.aiSettings.googleApiKey || "",
         openaiApiKey: profile.aiSettings.openaiApiKey || "",
         openrouterApiKey: profile.aiSettings.openrouterApiKey || "",
@@ -72,6 +78,10 @@ export function AISettings() {
 
     if (modelId.startsWith('googleai/')) {
       apiKey = aiSettings.googleApiKey;
+      if (!apiKey && hasServerKey) {
+        toast({ title: "Clave del servidor activa", description: "Gemini funciona con la clave configurada en el servidor. Todo listo." });
+        return;
+      }
       if (!apiKey) {
         toast({ title: "API Key required", description: "Please enter your Google AI API key.", variant: "destructive" });
         return;
@@ -170,6 +180,16 @@ export function AISettings() {
         </p>
       </div>
 
+      {hasServerKey && (
+        <Alert className="bg-emerald-50 border-emerald-200 rounded-2xl">
+          <Sparkles className="w-5 h-5 text-emerald-600" />
+          <AlertDescription className="text-sm text-emerald-800 font-medium">
+            <strong>Gemini AI está activo por defecto.</strong> Todas las funciones de IA funcionan automáticamente con Google Gemini. 
+            Si lo deseas, puedes configurar tu propia API Key para usar otro proveedor o modelo diferente.
+          </AlertDescription>
+        </Alert>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Main Settings Card */}
         <Card className="lg:col-span-7 border-border/50 shadow-lg bg-card">
@@ -202,8 +222,8 @@ export function AISettings() {
                     <SelectLabel className="text-xs font-bold text-primary uppercase tracking-wider px-3 py-2">
                       Google DeepMind
                     </SelectLabel>
-                    <SelectItem value="googleai/gemini-2.0-flash-exp" className="h-11 rounded-lg px-3">
-                      Gemini 2.0 Flash (Experimental)
+                    <SelectItem value="googleai/gemini-2.5-flash" className="h-11 rounded-lg px-3">
+                      Gemini 2.5 Flash
                     </SelectItem>
                     <SelectItem value="googleai/gemini-1.5-pro" className="h-11 rounded-lg px-3">
                       Gemini 1.5 Pro
@@ -277,15 +297,30 @@ export function AISettings() {
                     <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                       Gemini API Key
                     </label>
-                    <Badge variant="secondary" className="text-[9px] font-bold bg-emerald-50 text-emerald-600 border-emerald-100 uppercase">
-                      Recommended
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      {hasServerKey && (
+                        <Badge variant="secondary" className="text-[9px] font-bold bg-emerald-50 text-emerald-600 border-emerald-100 uppercase">
+                          Activa por defecto
+                        </Badge>
+                      )}
+                      <Badge variant="secondary" className="text-[9px] font-bold bg-emerald-50 text-emerald-600 border-emerald-100 uppercase">
+                        Recommended
+                      </Badge>
+                    </div>
                   </div>
+                  {hasServerKey && !settings.googleApiKey && (
+                    <Alert className="bg-blue-50 border-blue-100 rounded-xl">
+                      <CheckCircle2 className="w-4 h-4 text-blue-500" />
+                      <AlertDescription className="text-xs text-blue-700">
+                        Ya hay una clave Gemini configurada en el servidor. No necesitas añadir la tuya, pero puedes hacerlo para usar tu propia cuenta.
+                      </AlertDescription>
+                    </Alert>
+                  )}
                   <Input
                     type="password"
                     value={settings.googleApiKey}
                     onChange={(e) => setSettings({...settings, googleApiKey: e.target.value})}
-                    placeholder="AIzaSy..."
+                    placeholder={hasServerKey ? "(Usando clave del servidor — opcional override)" : "AIzaSy..."}
                     className="bg-muted/50 border-border/60 h-12 text-sm font-mono shadow-sm rounded-xl"
                   />
                   <p className="text-xs text-muted-foreground mt-2">

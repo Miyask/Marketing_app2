@@ -16,7 +16,7 @@ if (process.env.GOOGLE_GENAI_API_KEY) {
  */
 export const ai = genkit({
   plugins,
-  model: plugins.length > 0 ? 'googleai/gemini-2.0-flash-exp' : undefined,
+  model: plugins.length > 0 ? 'googleai/gemini-2.5-flash' : undefined,
 });
 
 /**
@@ -49,43 +49,66 @@ export async function runAIQuery(params: {
     }
 
     const realModelId = modelId.replace('googleai/', '');
+    const maxRetries = 3;
 
-    try {
-      const requestBody: any = {
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        generationConfig: {
-          maxOutputTokens: 4096,
-          temperature: 0.7,
-        },
-      };
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        const requestBody: any = {
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          generationConfig: {
+            maxOutputTokens: 8192,
+            temperature: 0.7,
+          },
+        };
 
-      // Enable JSON output mode if requested
-      if (jsonMode) {
-        requestBody.generationConfig.responseMimeType = 'application/json';
-      }
-
-      if (system) {
-        requestBody.systemInstruction = { parts: [{ text: system }] };
-      }
-
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${realModelId}:generateContent?key=${finalGoogleApiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestBody),
+        if (jsonMode) {
+          requestBody.generationConfig.responseMimeType = 'application/json';
         }
-      );
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(`Google AI Error: ${data.error?.message || JSON.stringify(data)}`);
+        if (system) {
+          requestBody.systemInstruction = { parts: [{ text: system }] };
+        }
+
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${realModelId}:generateContent?key=${finalGoogleApiKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestBody),
+          }
+        );
+
+        if (response.status === 429 && attempt < maxRetries) {
+          const retryData = await response.json();
+          const retryMatch = retryData.error?.message?.match(/retry in ([\d.]+)s/i);
+          const waitSec = retryMatch ? Math.min(parseFloat(retryMatch[1]), 60) : (attempt + 1) * 15;
+          console.log(`Rate limited (attempt ${attempt + 1}/${maxRetries}), waiting ${waitSec}s...`);
+          await new Promise(r => setTimeout(r, waitSec * 1000));
+          continue;
+        }
+
+        const data = await response.json();
+        if (!response.ok) {
+          if (response.status === 429) {
+            throw new Error("Cuota de API agotada. Tu clave de Google AI ha alcanzado el límite diario gratuito. Espera unas horas o habilita la facturación en Google AI Studio.");
+          }
+          throw new Error(`Google AI Error: ${data.error?.message || JSON.stringify(data)}`);
+        }
+        const parts = data.candidates?.[0]?.content?.parts || [];
+        const textPart = parts.filter((p: any) => p.text !== undefined).pop();
+        return textPart?.text || '';
+      } catch (error) {
+        if (attempt === maxRetries || !(error instanceof Error) || !error.message.includes('429')) {
+          console.error('Google AI Error:', error);
+          const msg = error instanceof Error ? error.message : 'Unknown error';
+          if (msg.includes('quota') || msg.includes('Cuota')) {
+            throw new Error(msg);
+          }
+          throw new Error(`Google AI Error: ${msg}`);
+        }
       }
-      return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    } catch (error) {
-      console.error('Google AI Error:', error);
-      throw new Error(`Google AI Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
+    throw new Error("Google AI Error: Max retries exceeded due to rate limiting.");
   }
 
   // 2. OpenAI via direct Fetch

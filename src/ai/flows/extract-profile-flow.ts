@@ -2,12 +2,14 @@
 'use server';
 /**
  * @fileOverview A GenAI flow for extracting deep business intelligence and owner data from a URL.
+ * Actually fetches the webpage HTML content and passes it to the AI for real analysis.
  *
  * - extractProfile - A function that handles the business scouting process.
  */
 
 import { ai, runAIQuery } from '@/ai/genkit';
 import { z } from 'genkit';
+import * as cheerio from 'cheerio';
 
 const ExtractProfileInputSchema = z.object({
   url: z.string().url().describe('The URL of the business website to analyze.'),
@@ -42,6 +44,114 @@ const ExtractProfileOutputSchema = z.object({
 });
 export type ExtractProfileOutput = z.infer<typeof ExtractProfileOutputSchema>;
 
+/**
+ * Fetches a webpage and extracts readable text content, meta tags, and links.
+ */
+async function fetchWebpageContent(url: string): Promise<{
+  text: string;
+  title: string;
+  metaDescription: string;
+  metaKeywords: string;
+  emails: string[];
+  phones: string[];
+  socialLinks: string[];
+  headings: string[];
+  links: string[];
+}> {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
+      },
+      signal: controller.signal,
+      redirect: 'follow',
+    });
+    clearTimeout(timeout);
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const html = await response.text();
+    const $ = cheerio.load(html);
+
+    // Remove scripts, styles, and hidden elements
+    $('script, style, noscript, iframe, svg, [hidden]').remove();
+
+    const title = $('title').text().trim();
+    const metaDescription = $('meta[name="description"]').attr('content') || '';
+    const metaKeywords = $('meta[name="keywords"]').attr('content') || '';
+
+    // Extract headings
+    const headings: string[] = [];
+    $('h1, h2, h3').each((_, el) => {
+      const text = $(el).text().trim();
+      if (text) headings.push(text);
+    });
+
+    // Extract visible text from body
+    const bodyText = $('body').text().replace(/\s+/g, ' ').trim();
+
+    // Extract emails from the page
+    const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+    const emails = [...new Set((html.match(emailRegex) || []).filter(e => !e.includes('example.com') && !e.includes('sentry')))];
+
+    // Extract phone numbers
+    const phoneRegex = /(?:\+?\d{1,3}[-.\s]?)?\(?\d{2,4}\)?[-.\s]?\d{3,4}[-.\s]?\d{3,4}/g;
+    const phones = [...new Set((html.match(phoneRegex) || []).filter(p => p.replace(/\D/g, '').length >= 9))];
+
+    // Extract social media links
+    const socialDomains = ['facebook.com', 'twitter.com', 'x.com', 'linkedin.com', 'instagram.com', 'youtube.com', 'tiktok.com', 'pinterest.com'];
+    const socialLinks: string[] = [];
+    $('a[href]').each((_, el) => {
+      const href = $(el).attr('href') || '';
+      if (socialDomains.some(domain => href.includes(domain))) {
+        socialLinks.push(href);
+      }
+    });
+
+    // Extract all links
+    const links: string[] = [];
+    $('a[href]').each((_, el) => {
+      const href = $(el).attr('href') || '';
+      if (href.startsWith('http')) links.push(href);
+    });
+
+    // Truncate body text to avoid token limits (keep first ~8000 chars)
+    const truncatedText = bodyText.substring(0, 8000);
+
+    return {
+      text: truncatedText,
+      title,
+      metaDescription,
+      metaKeywords,
+      emails: emails.slice(0, 5),
+      phones: phones.slice(0, 5),
+      socialLinks: [...new Set(socialLinks)].slice(0, 10),
+      headings: headings.slice(0, 20),
+      links: links.slice(0, 30),
+    };
+  } catch (error) {
+    console.error('Error fetching webpage:', error);
+    return {
+      text: `[Could not fetch the webpage at ${url}. The AI will analyze based on the URL pattern and domain name.]`,
+      title: '',
+      metaDescription: '',
+      metaKeywords: '',
+      emails: [],
+      phones: [],
+      socialLinks: [],
+      headings: [],
+      links: [],
+    };
+  }
+}
+
 export async function extractProfile(input: ExtractProfileInput): Promise<ExtractProfileOutput> {
   return extractProfileFlow(input);
 }
@@ -53,21 +163,45 @@ const extractProfileFlow = ai.defineFlow(
     outputSchema: ExtractProfileOutputSchema,
   },
   async (input) => {
-    const modelId = input.userConfig?.modelId || 'googleai/gemini-2.0-flash-exp';
-    
-    const promptText = `You are a Senior Digital Scout and OSINT Analyst. Your mission is to perform a deep tactical analysis of this URL: ${input.url}
+    const modelId = input.userConfig?.modelId || 'googleai/gemini-2.5-flash';
 
-Identify the "Human Behind the Brand": find the owner, CEO, or director's full name and their specific role. Extract direct contact information and analyze their market positioning.
+    // Actually fetch the webpage content for real analysis
+    const webData = await fetchWebpageContent(input.url);
 
-Additionally, perform a comprehensive website analysis covering:
-- STRENGTHS: What does this website do well? (design, content, functionality, user experience, etc.)
-- TECHNICAL WEAKNESSES: Technical issues (loading speed, mobile responsiveness, broken links, etc.)
-- MARKETING WEAKNESSES: Marketing gaps (SEO, CTAs, social proof, content strategy, etc.)
-- UX/UI WEAKNESSES: User experience issues (navigation, accessibility, clarity, etc.)
-- IMPROVEMENT OPPORTUNITIES: Specific actionable improvements
-- CONTENT ANALYSIS: Quality and relevance of the content
-- SEO ANALYSIS: Basic SEO assessment (meta tags, keywords, structure)
-- OVERALL SCORE: Rate the website from 1-10 based on the analysis
+    const promptText = `You are a Senior Digital Scout and OSINT Analyst. Your mission is to perform a deep tactical analysis of this website.
+
+**TARGET URL**: ${input.url}
+
+**SCRAPED PAGE TITLE**: ${webData.title || 'Not found'}
+
+**META DESCRIPTION**: ${webData.metaDescription || 'Not found'}
+
+**META KEYWORDS**: ${webData.metaKeywords || 'Not found'}
+
+**PAGE HEADINGS**:
+${webData.headings.length > 0 ? webData.headings.map(h => `- ${h}`).join('\n') : 'None found'}
+
+**EMAILS FOUND ON PAGE**: ${webData.emails.length > 0 ? webData.emails.join(', ') : 'None found'}
+
+**PHONES FOUND ON PAGE**: ${webData.phones.length > 0 ? webData.phones.join(', ') : 'None found'}
+
+**SOCIAL MEDIA LINKS FOUND**:
+${webData.socialLinks.length > 0 ? webData.socialLinks.map(l => `- ${l}`).join('\n') : 'None found'}
+
+**EXTRACTED PAGE TEXT CONTENT**:
+${webData.text}
+
+---
+
+Based on the REAL scraped data above, perform the following analysis:
+
+1. Identify the "Human Behind the Brand": find the owner, CEO, or director's full name and their specific role from the page content.
+2. Extract direct contact information (emails, phones found on the page).
+3. Analyze the website for strengths and weaknesses.
+4. Provide SEO and content analysis based on the actual meta tags and content.
+5. Rate the website overall from 1-10.
+
+If specific information cannot be found in the scraped data, indicate "No encontrado en la web" or provide your best analysis based on what IS available.
 
 Return ONLY a JSON object matching this schema:
 {
@@ -93,7 +227,7 @@ Return ONLY a JSON object matching this schema:
 
      const response = await runAIQuery({
        modelId,
-       system: "You are an expert in business intelligence and web scraping simulation. You only speak JSON.",
+       system: "You are an expert in business intelligence, OSINT, and web analysis. You analyze REAL scraped webpage data. You only speak JSON.",
        prompt: promptText,
        googleApiKey: input.userConfig?.googleApiKey,
        openaiApiKey: input.userConfig?.openaiApiKey,
@@ -103,8 +237,22 @@ Return ONLY a JSON object matching this schema:
 
     try {
       const cleanJson = response!.replace(/```json|```/g, '').trim();
-      return JSON.parse(cleanJson) as ExtractProfileOutput;
+      const parsed = JSON.parse(cleanJson);
+      const arrayFields = ['socialLinks', 'competitors', 'strengths', 'technicalWeaknesses', 'marketingWeaknesses', 'uxWeaknesses', 'improvementOpportunities'];
+      for (const field of arrayFields) {
+        if (parsed[field] && !Array.isArray(parsed[field])) {
+          parsed[field] = parsed[field] === 'No encontrado en la web' ? [] : [parsed[field]];
+        }
+        if (!parsed[field]) {
+          parsed[field] = [];
+        }
+      }
+      if (typeof parsed.overallScore !== 'number') {
+        parsed.overallScore = parseInt(parsed.overallScore) || 5;
+      }
+      return parsed as ExtractProfileOutput;
     } catch (e) {
+      console.error('Failed to parse AI response:', response?.substring(0, 500));
       throw new Error('Failed to extract profile data due to invalid AI response.');
     }
   }

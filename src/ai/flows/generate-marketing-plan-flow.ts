@@ -58,7 +58,7 @@ const generateMarketingPlanFlow = ai.defineFlow(
     outputSchema: MarketingPlanOutputSchema,
   },
   async (input) => {
-    const modelId = input.userConfig?.modelId || 'googleai/gemini-2.0-flash-exp';
+    const modelId = input.userConfig?.modelId || 'googleai/gemini-2.5-flash';
     
     const promptText = `You are a Senior Marketing Director. Create a high-level strategic marketing plan for:
 
@@ -98,11 +98,20 @@ Return ONLY a JSON object that matches this schema:
      });
 
     try {
-      // Clean potential markdown blocks if the model didn't output raw JSON
       const cleanJson = response!.replace(/```json|```/g, '').trim();
-      return JSON.parse(cleanJson) as MarketingPlanOutput;
+      const parsed = JSON.parse(cleanJson);
+      if (parsed.swotAnalysis) {
+        for (const key of ['strengths', 'weaknesses', 'opportunities', 'threats']) {
+          if (!Array.isArray(parsed.swotAnalysis[key])) {
+            parsed.swotAnalysis[key] = parsed.swotAnalysis[key] ? [parsed.swotAnalysis[key]] : [];
+          }
+        }
+      }
+      if (!Array.isArray(parsed.recommendedChannels)) parsed.recommendedChannels = [];
+      if (!Array.isArray(parsed.contentCalendarPreview)) parsed.contentCalendarPreview = [];
+      return parsed as MarketingPlanOutput;
     } catch (e) {
-      console.error("Failed to parse AI response:", response);
+      console.error("Failed to parse AI response:", response?.substring(0, 500));
       throw new Error('Failed to generate marketing plan due to invalid AI response format.');
     }
   }

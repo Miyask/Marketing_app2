@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Globe, User, Mail, Phone, Share2, Search, Loader2, Link, AlertCircle, Save, CheckCircle2, TrendingUp, UserCheck, ShieldCheck, Briefcase, Star, AlertTriangle, Lightbulb, Zap, Code, Layout, FileText, Gauge, CheckCircle, XCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import { doc, collection } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 import { extractProfile, type ExtractProfileOutput } from "@/ai/flows/extract-profile-flow";
 import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
+import { hasDefaultGoogleKey } from "@/ai/check-default-key";
 
 export function ProfileExtractor() {
   const { user } = useUser();
@@ -22,6 +23,7 @@ export function ProfileExtractor() {
   const [isScanning, setIsScanning] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [result, setResult] = useState<ExtractProfileOutput | null>(null);
+  const [hasServerKey, setHasServerKey] = useState(false);
 
   const userRef = useMemoFirebase(() => {
     if (!db || !user?.uid) return null;
@@ -29,11 +31,16 @@ export function ProfileExtractor() {
   }, [db, user?.uid]);
   const { data: profile } = useDoc(userRef);
 
+  useEffect(() => {
+    hasDefaultGoogleKey().then(setHasServerKey);
+  }, []);
+
   const handleExtract = async () => {
     if (!url) return;
     
     const aiSettings = profile?.aiSettings;
-    if (!aiSettings?.googleApiKey && !aiSettings?.openaiApiKey && !aiSettings?.openrouterApiKey) {
+    const hasAnyKey = aiSettings?.googleApiKey || aiSettings?.openaiApiKey || aiSettings?.openrouterApiKey || hasServerKey;
+    if (!hasAnyKey) {
       toast({ 
         title: "Credenciales Requeridas", 
         description: "Configura una API Key en Ajustes de IA para activar el Scouting Digital.",
@@ -46,7 +53,12 @@ export function ProfileExtractor() {
     try {
       const data = await extractProfile({
         url,
-        userConfig: aiSettings
+        userConfig: {
+          modelId: aiSettings?.modelId || 'googleai/gemini-2.5-flash',
+          googleApiKey: aiSettings?.googleApiKey,
+          openaiApiKey: aiSettings?.openaiApiKey,
+          openrouterApiKey: aiSettings?.openrouterApiKey,
+        }
       });
       setResult(data);
       toast({ title: "Perfil Decodificado", description: `Inteligencia de ${data.businessName} extraída con éxito.` });

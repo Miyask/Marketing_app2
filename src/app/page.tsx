@@ -1,7 +1,8 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useUser, useAuth } from "@/firebase";
 import { signOut } from "firebase/auth";
 import {
@@ -52,13 +53,36 @@ import { ProfileExtractor } from "@/components/prospector/profile-extractor";
 import { ClientDiscovery } from "@/components/prospector/client-discovery";
 
 export default function MarketScoutDashboard() {
-  const { user } = useUser();
-  const { auth } = useAuth();
+  const { user, isUserLoading } = useUser();
+  const auth = useAuth();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState("strategy");
+
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push("/auth");
+    }
+  }, [user, isUserLoading, router]);
 
   const handleSignOut = async () => {
     if (auth) await signOut(auth);
+    router.push("/auth");
   };
+
+  if (isUserLoading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background space-y-4">
+        <div className="premium-gradient p-4 rounded-2xl text-white shadow-xl animate-pulse-glow">
+          <Target className="w-10 h-10" />
+        </div>
+        <p className="text-sm text-muted-foreground font-medium">Cargando MarketScout...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <SidebarProvider defaultOpen={true}>

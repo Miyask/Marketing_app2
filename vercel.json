@@ -6,11 +6,6 @@
       "NEXT_TELEMETRY_DISABLED": "1"
     }
   },
-  "functions": {
-    "src/**/*.ts": {
-      "maxDuration": 30
-    }
-  },
   "regions": ["iad1"],
   "cleanUrls": true,
   "trailingSlash": false

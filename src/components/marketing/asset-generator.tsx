@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Zap, Sparkles, Loader2, Copy, Layout, Palette, FileText, CheckCircle2, Info, Save } from "lucide-react";
 import { generateMarketingAssets, type GenerateMarketingAssetsOutput } from "@/ai/flows/generate-marketing-assets-flow";
 import { useUser, useFirestore, useDoc, useMemoFirebase } from "@/firebase";
@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
+import { hasDefaultGoogleKey } from "@/ai/check-default-key";
 
 export function AssetGenerator() {
   const { user } = useUser();
@@ -32,19 +33,24 @@ export function AssetGenerator() {
     marketingGoal: "Reconocimiento de marca y fidelización"
   });
 
+  const [hasServerKey, setHasServerKey] = useState(false);
+
   const userRef = useMemoFirebase(() => {
     if (!db || !user?.uid) return null;
     return doc(db, "users", user.uid);
   }, [db, user?.uid]);
   const { data: profile } = useDoc(userRef);
 
+  useEffect(() => {
+    hasDefaultGoogleKey().then(setHasServerKey);
+  }, []);
+
   const handleGenerate = async () => {
     const aiSettings = profile?.aiSettings;
-    const modelId = aiSettings?.modelId || '';
+    const modelId = aiSettings?.modelId || 'googleai/gemini-2.5-flash';
     
-    // Check if appropriate API key exists for the selected model
     let hasKey = false;
-    if (modelId.startsWith('googleai/') && aiSettings?.googleApiKey) hasKey = true;
+    if (modelId.startsWith('googleai/') && (aiSettings?.googleApiKey || hasServerKey)) hasKey = true;
     else if (modelId.startsWith('openai/') && aiSettings?.openaiApiKey) hasKey = true;
     else if (modelId.startsWith('openrouter/') && aiSettings?.openrouterApiKey) hasKey = true;
     
@@ -61,7 +67,12 @@ export function AssetGenerator() {
     try {
       const result = await generateMarketingAssets({
         ...formData,
-        userConfig: aiSettings
+        userConfig: {
+          modelId: aiSettings?.modelId || 'googleai/gemini-2.5-flash',
+          googleApiKey: aiSettings?.googleApiKey,
+          openaiApiKey: aiSettings?.openaiApiKey,
+          openrouterApiKey: aiSettings?.openrouterApiKey,
+        }
       });
       setOutput(result);
       toast({ title: "Activos Listos", description: "He creado slogans, logos y folletos para ti." });

@@ -21,7 +21,7 @@ import { Target, Sparkles, UserCircle, ArrowRight, Loader2, ArrowLeft, Lock } fr
 import { useToast } from "@/hooks/use-toast";
 
 export default function AuthPage() {
-  const { auth } = useAuth();
+  const auth = useAuth();
   const { user, isUserLoading } = useUser();
   const db = useFirestore();
   const router = useRouter();
@@ -102,7 +102,20 @@ export default function AuthPage() {
       await syncUserProfile(result.user.uid, result.user.email, result.user.displayName);
       router.push("/");
     } catch (error: any) {
-      toast({ title: "Error", description: "Could not sign in with Google.", variant: "destructive" });
+      console.error("Google Sign-In error:", error.code, error.message);
+      let errorMessage = "No se pudo iniciar sesión con Google.";
+      if (error.code === 'auth/configuration-not-found' || error.code === 'auth/operation-not-allowed') {
+        errorMessage = "El inicio de sesión con Google no está habilitado. Actívalo en Firebase Console → Authentication → Sign-in method → Google.";
+      } else if (error.code === 'auth/popup-closed-by-user') {
+        errorMessage = "Se cerró la ventana de inicio de sesión.";
+      } else if (error.code === 'auth/unauthorized-domain') {
+        errorMessage = "Este dominio no está autorizado. Añádelo en Firebase Console → Authentication → Settings → Authorized domains.";
+      } else if (error.code === 'auth/internal-error') {
+        errorMessage = "Error interno de Firebase. Verifica que Google esté habilitado en Firebase Console → Authentication → Sign-in method.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      toast({ title: "Error de Google Sign-In", description: errorMessage, variant: "destructive" });
       setLoading(false);
     }
   };
