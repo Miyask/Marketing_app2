@@ -91,15 +91,15 @@ Return ONLY a JSON object matching this schema:
   "overallScore": number
 }`;
 
-    const response = await runAIQuery({
-      modelId,
-      system: "You are an expert in business intelligence and web scraping simulation. You only speak JSON.",
-      prompt: promptText,
-      apiKey: input.userConfig?.googleApiKey,
-      openaiKey: input.userConfig?.openaiApiKey,
-      openrouterKey: input.userConfig?.openrouterApiKey,
-      jsonMode: true
-    });
+     const response = await runAIQuery({
+       modelId,
+       system: "You are an expert in business intelligence and web scraping simulation. You only speak JSON.",
+       prompt: promptText,
+       googleApiKey: input.userConfig?.googleApiKey,
+       openaiApiKey: input.userConfig?.openaiApiKey,
+       openrouterApiKey: input.userConfig?.openrouterApiKey,
+       jsonMode: true
+     });
 
     try {
       const cleanJson = response!.replace(/```json|```/g, '').trim();

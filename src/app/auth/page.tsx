@@ -44,18 +44,13 @@ export default function AuthPage() {
     if (!db) return;
     const userRef = doc(db, "users", uid);
     try {
+      // Only set basic profile data; preserve existing aiSettings if any
       await setDoc(userRef, {
         id: uid,
         email: userEmail || "",
         fullName: name || userEmail?.split('@')[0] || "Usuario Pro",
         updatedAt: serverTimestamp(),
-        createdAt: serverTimestamp(),
-        aiSettings: {
-          modelId: "googleai/gemini-2.0-flash-exp",
-          googleApiKey: "AIzaSyDD7PB0c6UY-ymus8QBhA2-DODNspE3aI8",
-          openaiApiKey: "",
-          openrouterApiKey: ""
-        }
+        createdAt: serverTimestamp()
       }, { merge: true });
     } catch (err) {
       console.error("Error synchronizing profile:", err);
@@ -182,52 +177,85 @@ export default function AuthPage() {
   );
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden bg-background">
-      <div className="absolute top-[-10%] right-[-5%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px] animate-pulse" />
-      <div className="absolute bottom-[-10%] left-[-5%] w-[40%] h-[40%] bg-accent/10 rounded-full blur-[120px] animate-pulse" />
-      
-      <div className="w-full max-w-[1200px] grid lg:grid-cols-2 gap-20 items-center z-10">
-        <div className="hidden lg:flex flex-col space-y-8 animate-slide-in">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-[10px] font-bold w-fit tracking-widest uppercase hover-lift">
-            <Sparkles className="w-3 h-3" /> Marketing Intelligence Suite
+    <div className="min-h-screen flex lg:grid lg:grid-cols-2 bg-gradient-to-br from-slate-50 via-white to-slate-100">
+      {/* Left Side - Hero Section */}
+      <div className="hidden lg:flex flex-col justify-center p-12 xl:p-20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
+        
+        <div className="relative z-10 max-w-2xl">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 backdrop-blur border border-primary/20 text-primary text-xs font-bold tracking-widest uppercase mb-8 shadow-sm">
+            <Sparkles className="w-4 h-4" /> Marketing Intelligence Platform
           </div>
-          <h1 className="text-7xl font-headline font-bold leading-[1.1] text-foreground">
-            Estrategias que <span className="gradient-text">Conectan</span>.
+          
+          <h1 className="text-5xl xl:text-6xl font-bold text-foreground leading-tight mb-6">
+            Transforma tu estrategia con 
+            <span className="block mt-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Inteligencia Artificial
+            </span>
           </h1>
-          <p className="text-xl text-muted-foreground leading-relaxed max-w-lg">
-            MarketScout Pro transforma datos en planes maestros. Diseña tu éxito comercial con el poder de la IA predictiva.
+          
+          <p className="text-lg text-muted-foreground leading-relaxed mb-10">
+            MarketScout Pro combina análisis de datos avanzado, scouting digital y estrategias de marketing impulsadas por IA para llevar tu negocio al siguiente nivel.
           </p>
           
-          <div className="grid grid-cols-2 gap-6 pt-6">
-            <div className="flex flex-col gap-2 hover-lift cursor-pointer">
-              <div className="bg-primary/10 w-10 h-10 rounded-xl flex items-center justify-center"><ShieldCheck className="w-5 h-5 text-primary" /></div>
-              <span className="font-bold text-sm">Privacidad Total</span>
+          <div className="grid grid-cols-3 gap-6 mb-10">
+            <div className="text-center p-4 rounded-2xl bg-white/60 backdrop-blur border border-border/50 shadow-sm">
+              <div className="text-3xl font-bold gradient-text">50+</div>
+              <div className="text-xs text-muted-foreground font-medium mt-1">Modelos IA</div>
             </div>
-            <div className="flex flex-col gap-2 hover-lift cursor-pointer">
-              <div className="bg-accent/10 w-10 h-10 rounded-xl flex items-center justify-center"><Rocket className="w-5 h-5 text-accent" /></div>
-              <span className="font-bold text-sm">Escalabilidad</span>
+            <div className="text-center p-4 rounded-2xl bg-white/60 backdrop-blur border border-border/50 shadow-sm">
+              <div className="text-3xl font-bold gradient-text">10K+</div>
+              <div className="text-xs text-muted-foreground font-medium mt-1">Análisis</div>
+            </div>
+            <div className="text-center p-4 rounded-2xl bg-white/60 backdrop-blur border border-border/50 shadow-sm">
+              <div className="text-3xl font-bold gradient-text">98%</div>
+              <div className="text-xs text-muted-foreground font-medium mt-1">Precisión</div>
+            </div>
+          </div>
+          
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 rounded-full bg-primary" />
+              <span className="text-sm text-muted-foreground">Análisis competitivo en tiempo real</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 rounded-full bg-accent" />
+              <span className="text-sm text-muted-foreground">Estrategias de marketing personalizadas</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 rounded-full bg-primary" />
+              <span className="text-sm text-muted-foreground">Scouting digital automatizado</span>
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="w-full max-w-md mx-auto animate-scale-in">
-          <Card className="border-none shadow-[0_20px_50px_rgba(0,0,0,0.08)] rounded-[2.5rem] p-8 bg-white glass-morphism card-hover">
-            <CardHeader className="text-center pb-8">
-              <div className="bg-gradient-to-br from-primary to-accent w-14 h-14 rounded-2xl flex items-center justify-center text-white mx-auto mb-6 shadow-xl animate-pulse-glow">
-                <Target className="w-8 h-8" />
+      {/* Right Side - Auth Form */}
+      <div className="flex items-center justify-center p-6 lg:p-12 relative">
+        <div className="w-full max-w-md relative z-10">
+          <div className="bg-white rounded-3xl shadow-2xl border border-border/50 overflow-hidden">
+            {/* Decorative Header */}
+            <div className="h-2 bg-gradient-to-r from-primary via-accent to-primary" />
+            
+            <div className="p-8 lg:p-10">
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent mb-4 shadow-lg">
+                  <Target className="w-8 h-8 text-white" />
+                </div>
+                <h2 className="text-2xl font-bold text-foreground mb-2">MarketScout Pro</h2>
+                <p className="text-sm text-muted-foreground">Plataforma de inteligencia de marketing</p>
               </div>
-              <CardTitle className="text-3xl font-headline gradient-text">Bienvenido</CardTitle>
-              <CardDescription>Accede para empezar a liderar tu mercado.</CardDescription>
-            </CardHeader>
             <CardContent className="space-y-6">
               <Button 
-                className="w-full h-14 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-bold text-md rounded-2xl shadow-lg transition-all flex items-center justify-center gap-3 hover-lift"
+                className="w-full h-16 premium-gradient hover:opacity-90 text-white font-bold text-lg rounded-2xl shadow-xl transition-all flex items-center justify-center gap-3 hover-lift animate-gradient"
                 onClick={handleAnonymousSignIn}
                 disabled={loading}
               >
-                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <UserCircle className="w-5 h-5" />}
+                {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : <UserCircle className="w-6 h-6" />}
                 {loading ? "Iniciando..." : "Entrar como Invitado"}
-                {!loading && <ArrowRight className="w-4 h-4 ml-auto" />}
+                {!loading && <ArrowRight className="w-5 h-5 ml-auto" />}
               </Button>
 
               <div className="relative">
@@ -265,34 +293,34 @@ export default function AuthPage() {
                 </div>
               ) : (
                 <Tabs defaultValue="login" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 mb-6 bg-muted/50 p-1 h-11 rounded-xl">
-                    <TabsTrigger value="login" className="font-bold text-xs uppercase">Login</TabsTrigger>
-                    <TabsTrigger value="register" className="font-bold text-xs uppercase">Registro</TabsTrigger>
+                  <TabsList className="grid w-full grid-cols-2 mb-8 bg-white/50 p-1 h-14 rounded-xl border border-border/30">
+                    <TabsTrigger value="login" className="font-bold text-sm uppercase data-[state=active]:premium-gradient data-[state=active]:text-white">Login</TabsTrigger>
+                    <TabsTrigger value="register" className="font-bold text-sm uppercase data-[state=active]:premium-gradient data-[state=active]:text-white">Registro</TabsTrigger>
                   </TabsList>
-                  <TabsContent value="login" className="space-y-4">
-                    <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Tu Email" className="h-12 bg-muted/30 border-none rounded-xl input-glow transition-all hover:bg-white" />
-                    <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Contraseña" className="h-12 bg-muted/30 border-none rounded-xl input-glow transition-all hover:bg-white" />
+                  <TabsContent value="login" className="space-y-5">
+                    <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Tu Email" className="h-14 bg-white/50 border-2 border-border/30 rounded-xl input-glow transition-all hover:bg-white hover:border-primary/30 text-base" />
+                    <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Contraseña" className="h-14 bg-white/50 border-2 border-border/30 rounded-xl input-glow transition-all hover:bg-white hover:border-primary/30 text-base" />
                     <Button 
                       variant="ghost" 
                       size="sm" 
                       onClick={() => setResetMode(true)}
-                      className="text-xs text-primary hover:text-primary/80 w-full"
+                      className="text-sm text-primary hover:text-primary/80 w-full font-medium"
                     >
                       ¿Olvidaste tu contraseña?
                     </Button>
-                    <Button className="w-full h-12 rounded-xl font-bold bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 hover-lift" onClick={() => handleEmailAuth('login')} disabled={loading}>Entrar</Button>
+                    <Button className="w-full h-14 rounded-xl font-bold premium-gradient hover:opacity-90 hover-lift text-base" onClick={() => handleEmailAuth('login')} disabled={loading}>Entrar</Button>
                   </TabsContent>
-                  <TabsContent value="register" className="space-y-4">
-                    <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email de Empresa" className="h-12 bg-muted/30 border-none rounded-xl input-glow transition-all hover:bg-white" />
-                    <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Crea una Contraseña (mín. 6 caracteres)" className="h-12 bg-muted/30 border-none rounded-xl input-glow transition-all hover:bg-white" />
-                    <Input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirma tu Contraseña" className="h-12 bg-muted/30 border-none rounded-xl input-glow transition-all hover:bg-white" />
-                    <Button className="w-full h-12 rounded-xl font-bold bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90 hover-lift" onClick={() => handleEmailAuth('register')} disabled={loading}>Crear Cuenta</Button>
+                  <TabsContent value="register" className="space-y-5">
+                    <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email de Empresa" className="h-14 bg-white/50 border-2 border-border/30 rounded-xl input-glow transition-all hover:bg-white hover:border-primary/30 text-base" />
+                    <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Crea una Contraseña (mín. 6 caracteres)" className="h-14 bg-white/50 border-2 border-border/30 rounded-xl input-glow transition-all hover:bg-white hover:border-primary/30 text-base" />
+                    <Input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirma tu Contraseña" className="h-14 bg-white/50 border-2 border-border/30 rounded-xl input-glow transition-all hover:bg-white hover:border-primary/30 text-base" />
+                    <Button className="w-full h-14 rounded-xl font-bold premium-gradient hover:opacity-90 hover-lift text-base" onClick={() => handleEmailAuth('register')} disabled={loading}>Crear Cuenta</Button>
                   </TabsContent>
                 </Tabs>
               )}
               
-              <Button variant="outline" className="w-full h-12 border-border hover:bg-muted/50 rounded-xl font-bold gap-3" onClick={handleGoogleSignIn} disabled={loading}>
-                <svg className="w-4 h-4" viewBox="0 0 24 24">
+              <Button variant="outline" className="w-full h-14 border-2 border-border/30 hover:bg-white hover:border-primary/30 rounded-xl font-bold gap-3 text-base hover-lift" onClick={handleGoogleSignIn} disabled={loading}>
+                <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                   <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
                   <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" />

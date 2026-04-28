@@ -57,15 +57,15 @@ Return ONLY a JSON object matching this schema:
   "brochureOutline": "string"
 }`;
 
-    const response = await runAIQuery({
-      modelId,
-      system: "You are a creative director that only speaks JSON.",
-      prompt: promptText,
-      apiKey: input.userConfig?.googleApiKey,
-      openaiKey: input.userConfig?.openaiApiKey,
-      openrouterKey: input.userConfig?.openrouterApiKey,
-      jsonMode: true
-    });
+     const response = await runAIQuery({
+       modelId,
+       system: "You are a creative director that only speaks JSON.",
+       prompt: promptText,
+       googleApiKey: input.userConfig?.googleApiKey,
+       openaiApiKey: input.userConfig?.openaiApiKey,
+       openrouterApiKey: input.userConfig?.openrouterApiKey,
+       jsonMode: true
+     });
 
     try {
       const cleanJson = response!.replace(/```json|```/g, '').trim();

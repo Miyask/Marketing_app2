@@ -87,15 +87,15 @@ Return ONLY a JSON object that matches this schema:
   "estimatedRoi": "string"
 }`;
 
-    const response = await runAIQuery({
-      modelId,
-      system: "You are an expert marketing strategist that only speaks JSON.",
-      prompt: promptText,
-      apiKey: input.userConfig?.googleApiKey,
-      openaiKey: input.userConfig?.openaiApiKey,
-      openrouterKey: input.userConfig?.openrouterApiKey,
-      jsonMode: true
-    });
+     const response = await runAIQuery({
+       modelId,
+       system: "You are an expert marketing strategist that only speaks JSON.",
+       prompt: promptText,
+       googleApiKey: input.userConfig?.googleApiKey,
+       openaiApiKey: input.userConfig?.openaiApiKey,
+       openrouterApiKey: input.userConfig?.openrouterApiKey,
+       jsonMode: true
+     });
 
     try {
       // Clean potential markdown blocks if the model didn't output raw JSON

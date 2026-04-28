@@ -63,15 +63,15 @@ export default function MarketScoutDashboard() {
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="flex min-h-svh w-full overflow-hidden bg-background">
-        <Sidebar variant="sidebar" className="border-r border-border/50 bg-sidebar/50 backdrop-blur-xl">
-          <SidebarHeader className="p-8 pb-10">
+        <Sidebar variant="sidebar" className="border-r border-border/30 bg-white/80 backdrop-blur-xl shadow-xl">
+          <SidebarHeader className="p-8 pb-10 bg-gradient-to-b from-primary/5 to-transparent">
             <div className="flex items-center gap-4">
-              <div className="bg-primary p-3 rounded-2xl text-white shadow-lg glow-primary animate-float">
-                <Target className="w-6 h-6" />
+              <div className="premium-gradient p-4 rounded-2xl text-white shadow-xl animate-pulse-glow">
+                <Target className="w-7 h-7" />
               </div>
               <div className="flex flex-col">
-                <h1 className="text-xl font-headline font-bold text-foreground tracking-tighter leading-none">MarketScout</h1>
-                <span className="text-[10px] font-bold text-primary uppercase tracking-[0.2em] mt-1">Intelligence</span>
+                <h1 className="text-2xl font-bold text-foreground tracking-tight leading-none">MarketScout</h1>
+                <span className="text-[10px] font-bold gradient-text uppercase tracking-[0.2em] mt-1">Intelligence</span>
               </div>
             </div>
           </SidebarHeader>
@@ -85,7 +85,7 @@ export default function MarketScoutDashboard() {
                     <SidebarMenuButton 
                       isActive={activeTab === "strategy"} 
                       onClick={() => setActiveTab("strategy")}
-                      className="h-12 rounded-2xl data-[active=true]:bg-primary data-[active=true]:text-white data-[active=true]:shadow-lg data-[active=true]:glow-primary transition-all px-5 mb-2"
+                      className="h-14 rounded-xl data-[active=true]:premium-gradient data-[active=true]:text-white data-[active=true]:shadow-lg data-[active=true]:glow-purple transition-all px-5 mb-2 hover-lift"
                     >
                       <Sparkles className="w-5 h-5" />
                       <span className="font-bold text-sm ml-2">Análisis Maestro</span>
@@ -95,7 +95,7 @@ export default function MarketScoutDashboard() {
                     <SidebarMenuButton 
                       isActive={activeTab === "assets"} 
                       onClick={() => setActiveTab("assets")}
-                      className="h-12 rounded-2xl data-[active=true]:bg-primary data-[active=true]:text-white data-[active=true]:shadow-lg data-[active=true]:glow-primary transition-all px-5"
+                      className="h-14 rounded-xl data-[active=true]:premium-gradient data-[active=true]:text-white data-[active=true]:shadow-lg data-[active=true]:glow-purple transition-all px-5 hover-lift"
                     >
                       <Zap className="w-5 h-5" />
                       <span className="font-bold text-sm ml-2">Activos Creativos</span>
@@ -110,13 +110,13 @@ export default function MarketScoutDashboard() {
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
-                    <SidebarMenuButton isActive={activeTab === "discovery"} onClick={() => setActiveTab("discovery")} className="h-12 rounded-2xl px-5 mb-2 hover:bg-primary/5 hover:text-primary transition-colors">
+                    <SidebarMenuButton isActive={activeTab === "discovery"} onClick={() => setActiveTab("discovery")} className="h-14 rounded-xl px-5 mb-2 hover:bg-primary/10 hover:text-primary transition-all hover-lift">
                       <Search className="w-5 h-5" />
                       <span className="font-semibold text-sm ml-2">Market Discovery</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
-                    <SidebarMenuButton isActive={activeTab === "extractor"} onClick={() => setActiveTab("extractor")} className="h-12 rounded-2xl px-5 hover:bg-primary/5 hover:text-primary transition-colors">
+                    <SidebarMenuButton isActive={activeTab === "extractor"} onClick={() => setActiveTab("extractor")} className="h-14 rounded-xl px-5 hover:bg-primary/10 hover:text-primary transition-all hover-lift">
                       <Globe className="w-5 h-5" />
                       <span className="font-semibold text-sm ml-2">Digital Scouting</span>
                     </SidebarMenuButton>
@@ -130,13 +130,13 @@ export default function MarketScoutDashboard() {
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
-                    <SidebarMenuButton isActive={activeTab === "leads"} onClick={() => setActiveTab("leads")} className="h-12 rounded-2xl px-5 mb-2 hover:bg-primary/5 hover:text-primary transition-colors">
+                    <SidebarMenuButton isActive={activeTab === "leads"} onClick={() => setActiveTab("leads")} className="h-14 rounded-xl px-5 mb-2 hover:bg-primary/10 hover:text-primary transition-all hover-lift">
                       <Database className="w-5 h-5" />
                       <span className="font-semibold text-sm ml-2">Pipeline Leads</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
-                    <SidebarMenuButton isActive={activeTab === "roi"} onClick={() => setActiveTab("roi")} className="h-12 rounded-2xl px-5 hover:bg-primary/5 hover:text-primary transition-colors">
+                    <SidebarMenuButton isActive={activeTab === "roi"} onClick={() => setActiveTab("roi")} className="h-14 rounded-xl px-5 hover:bg-primary/10 hover:text-primary transition-all hover-lift">
                       <BarChart3 className="w-5 h-5" />
                       <span className="font-semibold text-sm ml-2">Simulador ROI</span>
                     </SidebarMenuButton>
@@ -147,23 +147,23 @@ export default function MarketScoutDashboard() {
           </SidebarContent>
           
           <SidebarFooter className="p-8">
-            <div className="bg-white/50 backdrop-blur-sm border border-border/50 p-5 rounded-3xl shadow-sm space-y-5">
+            <div className="modern-card p-6 rounded-3xl shadow-xl space-y-5">
               <div className="flex items-center gap-4">
-                <Avatar className="w-10 h-10 rounded-2xl border-2 border-primary/20">
+                <Avatar className="w-12 h-12 rounded-2xl border-2 border-primary/30 shadow-lg">
                   <AvatarImage src={user?.photoURL || ""} />
-                  <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white font-bold">
+                  <AvatarFallback className="premium-gradient text-white font-bold text-lg">
                     {user?.email?.[0].toUpperCase() || "M"}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 overflow-hidden">
-                  <p className="text-xs font-bold truncate text-foreground">{user?.displayName || user?.email?.split('@')[0] || "Consultor"}</p>
-                  <Badge variant="secondary" className="text-[9px] h-4 px-2 uppercase tracking-tighter bg-primary/10 text-primary border-none font-bold">PRO PLAN</Badge>
+                  <p className="text-sm font-bold truncate text-foreground">{user?.displayName || user?.email?.split('@')[0] || "Consultor"}</p>
+                  <Badge variant="secondary" className="text-[9px] h-5 px-3 uppercase tracking-tighter premium-gradient text-white border-none font-bold mt-1">PRO PLAN</Badge>
                 </div>
               </div>
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="w-full justify-start text-[11px] font-bold text-muted-foreground hover:text-destructive hover:bg-destructive/5 rounded-xl h-10 px-4"
+                className="w-full justify-start text-xs font-bold text-muted-foreground hover:text-destructive hover:bg-destructive/5 rounded-xl h-12 px-4 hover-lift"
                 onClick={handleSignOut}
               >
                 <LogOut className="w-4 h-4 mr-3" /> Cerrar Sesión
@@ -173,11 +173,11 @@ export default function MarketScoutDashboard() {
         </Sidebar>
 
         <SidebarInset className="flex-1 overflow-auto">
-          <header className="sticky top-0 z-40 flex h-24 items-center gap-6 px-12 border-b border-border/30 bg-white/80 backdrop-blur-xl">
-            <SidebarTrigger className="text-foreground hover:bg-primary/10 hover:text-primary rounded-xl p-2 h-10 w-10" />
+          <header className="sticky top-0 z-40 flex h-20 items-center gap-6 px-8 border-b border-border/30 bg-white/90 backdrop-blur-xl shadow-sm">
+            <SidebarTrigger className="text-foreground hover:bg-primary/10 hover:text-primary rounded-xl p-2 h-10 w-10 hover-lift" />
             <div className="h-8 w-px bg-border/40 mx-2" />
             <div className="flex flex-col">
-              <h2 className="text-sm font-bold text-foreground flex items-center gap-3 uppercase tracking-widest">
+              <h2 className="text-sm font-bold gradient-text flex items-center gap-3 uppercase tracking-widest">
                 {activeTab === "strategy" && "Central Estratégica"}
                 {activeTab === "assets" && "Laboratorio Creativo"}
                 {activeTab === "discovery" && "Inteligencia de Mercado"}
@@ -188,15 +188,15 @@ export default function MarketScoutDashboard() {
               </h2>
             </div>
             <div className="flex-1" />
-            <div className="flex items-center gap-5">
-              <div className="hidden md:flex items-center gap-2 bg-muted/50 p-1 rounded-2xl border border-border/50">
-                 <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-white hover:shadow-sm"><Bell className="w-4 h-4 text-muted-foreground" /></Button>
-                 <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-white hover:shadow-sm"><UserIcon className="w-4 h-4 text-muted-foreground" /></Button>
+            <div className="flex items-center gap-4">
+              <div className="hidden md:flex items-center gap-2 bg-white/50 p-1.5 rounded-2xl border border-border/30 shadow-sm">
+                 <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-white hover:shadow-sm hover-lift"><Bell className="w-4 h-4 text-muted-foreground" /></Button>
+                 <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-white hover:shadow-sm hover-lift"><UserIcon className="w-4 h-4 text-muted-foreground" /></Button>
               </div>
               <Button 
                 onClick={() => setActiveTab("settings")}
                 variant="outline" 
-                className="rounded-2xl border-border/50 bg-white hover:bg-primary/5 hover:border-primary/20 hover:text-primary h-12 px-6 text-xs font-bold shadow-sm transition-all"
+                className="rounded-xl border-2 border-border/30 bg-white hover:bg-primary/5 hover:border-primary/30 hover:text-primary h-11 px-6 text-xs font-bold shadow-sm transition-all hover-lift"
               >
                 <Cpu className="w-5 h-5 mr-3 text-primary" /> Motor IA
               </Button>

@@ -35,10 +35,19 @@ export function ClientDiscovery() {
   const { data: profile } = useDoc(userRef);
 
   const handleSearch = async () => {
-    if (!profile?.aiSettings?.apiKey) {
+    const aiSettings = profile?.aiSettings;
+    const modelId = aiSettings?.modelId || '';
+    
+    // Check if appropriate API key exists for the selected model
+    let hasKey = false;
+    if (modelId.startsWith('googleai/') && aiSettings?.googleApiKey) hasKey = true;
+    else if (modelId.startsWith('openai/') && aiSettings?.openaiApiKey) hasKey = true;
+    else if (modelId.startsWith('openrouter/') && aiSettings?.openrouterApiKey) hasKey = true;
+    
+    if (!hasKey) {
       toast({ 
         title: "API Key requerida", 
-        description: "Configura tu API Key en Ajustes de IA para activar el buscador inteligente.",
+        description: "Configura tu API Key correspondiente en Ajustes de IA para activar el buscador inteligente.",
         variant: "destructive"
       });
       return;

@@ -39,10 +39,19 @@ export function AssetGenerator() {
   const { data: profile } = useDoc(userRef);
 
   const handleGenerate = async () => {
-    if (!profile?.aiSettings?.apiKey) {
+    const aiSettings = profile?.aiSettings;
+    const modelId = aiSettings?.modelId || '';
+    
+    // Check if appropriate API key exists for the selected model
+    let hasKey = false;
+    if (modelId.startsWith('googleai/') && aiSettings?.googleApiKey) hasKey = true;
+    else if (modelId.startsWith('openai/') && aiSettings?.openaiApiKey) hasKey = true;
+    else if (modelId.startsWith('openrouter/') && aiSettings?.openrouterApiKey) hasKey = true;
+    
+    if (!hasKey) {
       toast({ 
         title: "API Key requerida", 
-        description: "Configura tu API Key en Ajustes de IA para activar el motor creativo.",
+        description: "Configura tu API Key correspondiente en Ajustes de IA para activar el motor creativo.",
         variant: "destructive"
       });
       return;

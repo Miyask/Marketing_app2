@@ -4,100 +4,156 @@ import { googleAI } from '@genkit-ai/google-genai';
 
 /**
  * Global Genkit instance configured with the Google AI plugin.
- * Handles the core AI logic for Gemini models.
+ * Uses environment variable only - user-provided keys are handled per-request.
  */
 export const ai = genkit({
   plugins: [
-    googleAI()
+    googleAI({ apiKey: process.env.GOOGLE_GENAI_API_KEY })
   ],
   model: 'googleai/gemini-2.0-flash-exp',
 });
 
 /**
+ * Helper to determine if a value is a non-empty string
+ */
+function hasValue(val: string | undefined | null): val is string {
+  return typeof val === 'string' && val.trim().length > 0;
+}
+
+/**
  * A robust AI Router that can handle multiple providers (Google, OpenAI, OpenRouter).
- * This function handles the secure communication with AI APIs.
+ * Uses user-provided API keys when available, falls back to environment variables.
  */
 export async function runAIQuery(params: {
   modelId: string;
   system?: string;
   prompt: string;
-  apiKey?: string;
-  openaiKey?: string;
-  openrouterKey?: string;
+  googleApiKey?: string;
+  openaiApiKey?: string;
+  openrouterApiKey?: string;
   jsonMode?: boolean;
 }) {
-  const { modelId, prompt, system, apiKey, openaiKey, openrouterKey, jsonMode } = params;
+  const { modelId, prompt, system, googleApiKey, openaiApiKey, openrouterApiKey, jsonMode } = params;
 
-  // 1. Google Gemini via Genkit
+  // 1. Google Gemini via direct REST API (respects user-provided keys)
   if (modelId.startsWith('googleai/')) {
-    const { text } = await ai.generate({
-      model: modelId,
-      system,
-      prompt,
-      config: {
-        maxOutputTokens: 4096,
-        temperature: 0.7,
+    const finalGoogleApiKey = googleApiKey || process.env.GOOGLE_GENAI_API_KEY;
+    if (!hasValue(finalGoogleApiKey)) {
+      throw new Error("Google API Key missing. Please configure your Google AI key in settings.");
+    }
+
+    const realModelId = modelId.replace('googleai/', '');
+
+    try {
+      const requestBody: any = {
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: {
+          maxOutputTokens: 4096,
+          temperature: 0.7,
+        },
+      };
+
+      // Enable JSON output mode if requested
+      if (jsonMode) {
+        requestBody.generationConfig.responseMimeType = 'application/json';
       }
-    });
-    return text;
+
+      if (system) {
+        requestBody.systemInstruction = { parts: [{ text: system }] };
+      }
+
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${realModelId}:generateContent?key=${finalGoogleApiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestBody),
+        }
+      );
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(`Google AI Error: ${data.error?.message || JSON.stringify(data)}`);
+      }
+      return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    } catch (error) {
+      console.error('Google AI Error:', error);
+      throw new Error(`Google AI Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   }
 
-  // 2. OpenAI via direct Fetch (no extra dependencies needed)
+  // 2. OpenAI via direct Fetch
   if (modelId.startsWith('openai/')) {
     const realModelId = modelId.replace('openai/', '');
-    const finalApiKey = openaiKey || process.env.OPENAI_API_KEY;
-    
-    if (!finalApiKey) throw new Error("OpenAI API Key missing.");
+    const finalApiKey = openaiApiKey || process.env.OPENAI_API_KEY;
+    if (!hasValue(finalApiKey)) {
+      throw new Error("OpenAI API Key missing. Please configure your OpenAI key in settings.");
+    }
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${finalApiKey}`
-      },
-      body: JSON.stringify({
-        model: realModelId,
-        messages: [
-          ...(system ? [{ role: 'system', content: system }] : []),
-          { role: 'user', content: prompt }
-        ],
-        ...(jsonMode ? { response_format: { type: 'json_object' } } : {})
-      })
-    });
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${finalApiKey}`
+        },
+        body: JSON.stringify({
+          model: realModelId,
+          messages: [
+            ...(system ? [{ role: 'system', content: system }] : []),
+            { role: 'user', content: prompt }
+          ],
+          ...(jsonMode ? { response_format: { type: 'json_object' } } : {})
+        })
+      });
 
-    const data = await response.json();
-    if (data.error) throw new Error(`OpenAI Error: ${data.error.message}`);
-    return data.choices[0].message.content;
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(`OpenAI Error: ${data.error?.message || JSON.stringify(data)}`);
+      }
+      return data.choices[0].message.content;
+    } catch (error) {
+      console.error('OpenAI Error:', error);
+      throw new Error(`OpenAI Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   }
 
   // 3. OpenRouter (Llama, Claude, Qwen, DeepSeek, Grok)
   if (modelId.startsWith('openrouter/')) {
     const realModelId = modelId.replace('openrouter/', '');
-    const finalApiKey = openrouterKey || process.env.OPENROUTER_API_KEY;
+    const finalApiKey = openrouterApiKey || process.env.OPENROUTER_API_KEY;
+    if (!hasValue(finalApiKey)) {
+      throw new Error("OpenRouter API Key missing. Please configure your OpenRouter key in settings.");
+    }
 
-    if (!finalApiKey) throw new Error("OpenRouter API Key missing.");
+    try {
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${finalApiKey}`,
+          'HTTP-Referer': 'https://marketscout-pro.app',
+          'X-Title': 'MarketScout Pro'
+        },
+        body: JSON.stringify({
+          model: realModelId,
+          messages: [
+            ...(system ? [{ role: 'system', content: system }] : []),
+            { role: 'user', content: prompt }
+          ],
+          ...(jsonMode ? { response_format: { type: 'json_object' } } : {})
+        })
+      });
 
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${finalApiKey}`,
-        'HTTP-Referer': 'https://marketscout-pro.app',
-        'X-Title': 'MarketScout Pro'
-      },
-      body: JSON.stringify({
-        model: realModelId,
-        messages: [
-          ...(system ? [{ role: 'system', content: system }] : []),
-          { role: 'user', content: prompt }
-        ],
-        ...(jsonMode ? { response_format: { type: 'json_object' } } : {})
-      })
-    });
-
-    const data = await response.json();
-    if (data.error) throw new Error(`OpenRouter Error: ${data.error.message}`);
-    return data.choices[0].message.content;
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(`OpenRouter Error: ${data.error?.message || JSON.stringify(data)}`);
+      }
+      return data.choices[0].message.content;
+    } catch (error) {
+      console.error('OpenRouter Error:', error);
+      throw new Error(`OpenRouter Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   }
 
   throw new Error(`Unsupported model provider: ${modelId}`);
