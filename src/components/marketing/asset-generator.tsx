@@ -61,6 +61,7 @@ export function AssetGenerator() {
     try {
       const result = await generateMarketingAssets({
         ...formData,
+        userConfig: aiSettings
       });
       setOutput(result);
       toast({ title: "Activos Listos", description: "He creado slogans, logos y folletos para ti." });
