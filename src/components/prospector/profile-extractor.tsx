@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Globe, User, Mail, Phone, Share2, Search, Loader2, Link, AlertCircle, Save, CheckCircle2, TrendingUp, UserCheck, ShieldCheck, Briefcase } from "lucide-react";
+import { Globe, User, Mail, Phone, Share2, Search, Loader2, Link, AlertCircle, Save, CheckCircle2, TrendingUp, UserCheck, ShieldCheck, Briefcase, Star, AlertTriangle, Lightbulb, Zap, Code, Layout, FileText, Gauge, CheckCircle, XCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -84,7 +84,15 @@ export function ProfileExtractor() {
         marketingGap: result.marketingGap,
         ownerRole: result.ownerRole,
         suggestedApproach: result.suggestedApproach,
-        competitors: result.competitors
+        competitors: result.competitors,
+        strengths: result.strengths,
+        technicalWeaknesses: result.technicalWeaknesses,
+        marketingWeaknesses: result.marketingWeaknesses,
+        uxWeaknesses: result.uxWeaknesses,
+        improvementOpportunities: result.improvementOpportunities,
+        contentAnalysis: result.contentAnalysis,
+        seoAnalysis: result.seoAnalysis,
+        overallScore: result.overallScore
       }
     });
 
@@ -170,10 +178,10 @@ export function ProfileExtractor() {
         {result && !isScanning && (
           <div className="animate-fade-in space-y-10">
             <Card className="border-none shadow-2xl bg-white rounded-[4rem] overflow-hidden">
-              <div className="bg-primary/5 p-16 lg:p-20 border-b border-border/40">
+              <div className="bg-gradient-to-r from-primary/10 to-accent/10 p-16 lg:p-20 border-b border-border/40">
                 <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-12">
                   <div className="flex items-center gap-10">
-                    <div className="w-24 h-24 rounded-[2.5rem] bg-primary flex items-center justify-center text-white text-4xl font-bold shadow-2xl glow-primary">
+                    <div className="w-24 h-24 rounded-[2.5rem] bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-4xl font-bold shadow-2xl">
                       {result.businessName.charAt(0)}
                     </div>
                     <div className="space-y-4">
@@ -181,6 +189,9 @@ export function ProfileExtractor() {
                       <div className="flex flex-wrap gap-3">
                         <Badge className="bg-primary/10 text-primary border-none px-5 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-full">{result.industry}</Badge>
                         <Badge className="bg-accent/10 text-accent border-none px-5 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-full">{result.ownerRole}</Badge>
+                        <Badge className={`border-none px-5 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-full ${result.overallScore >= 7 ? 'bg-emerald-100 text-emerald-700' : result.overallScore >= 5 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}`}>
+                          <Gauge className="w-3 h-3 mr-1" /> Score: {result.overallScore}/10
+                        </Badge>
                       </div>
                     </div>
                   </div>
@@ -214,7 +225,7 @@ export function ProfileExtractor() {
                 </div>
 
                 <div className="space-y-12">
-                  <div className="p-12 lg:p-16 rounded-[3.5rem] bg-primary text-white relative overflow-hidden group shadow-2xl glow-primary">
+                  <div className="p-12 lg:p-16 rounded-[3.5rem] bg-gradient-to-br from-primary to-accent text-white relative overflow-hidden group shadow-2xl">
                     <div className="absolute top-[-20%] right-[-10%] w-80 h-80 bg-white/10 rounded-full blur-3xl" />
                     <div className="relative z-10 space-y-6">
                       <div className="flex items-center gap-4 text-[11px] font-bold tracking-[0.4em] uppercase opacity-70">
@@ -223,6 +234,116 @@ export function ProfileExtractor() {
                       <p className="text-2xl lg:text-3xl font-medium leading-relaxed italic border-l-4 border-white/20 pl-10 font-headline">
                         "{result.suggestedApproach}"
                       </p>
+                    </div>
+                  </div>
+
+                  {/* Fortalezas */}
+                  <div className="space-y-6">
+                    <h4 className="text-[12px] font-bold uppercase tracking-[0.3em] text-emerald-600 px-2 flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5" /> Fortalezas Detectadas
+                    </h4>
+                    <div className="grid gap-4">
+                      {result.strengths.map((strength, i) => (
+                        <div key={i} className="bg-emerald-50 border border-emerald-200 p-6 rounded-[2rem] flex items-start gap-4">
+                          <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                          <p className="text-sm text-foreground leading-relaxed">{strength}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Debilidades Técnicas */}
+                  <div className="space-y-6">
+                    <h4 className="text-[12px] font-bold uppercase tracking-[0.3em] text-red-600 px-2 flex items-center gap-2">
+                      <Code className="w-5 h-5" /> Debilidades Técnicas
+                    </h4>
+                    <div className="grid gap-4">
+                      {result.technicalWeaknesses.length > 0 ? result.technicalWeaknesses.map((weakness, i) => (
+                        <div key={i} className="bg-red-50 border border-red-200 p-6 rounded-[2rem] flex items-start gap-4">
+                          <XCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+                          <p className="text-sm text-foreground leading-relaxed">{weakness}</p>
+                        </div>
+                      )) : (
+                        <div className="bg-emerald-50 border border-emerald-200 p-6 rounded-[2rem] flex items-center gap-4">
+                          <CheckCircle className="w-5 h-5 text-emerald-600" />
+                          <p className="text-sm text-foreground">No se detectaron debilidades técnicas significativas</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Debilidades de Marketing */}
+                  <div className="space-y-6">
+                    <h4 className="text-[12px] font-bold uppercase tracking-[0.3em] text-amber-600 px-2 flex items-center gap-2">
+                      <AlertTriangle className="w-5 h-5" /> Debilidades de Marketing
+                    </h4>
+                    <div className="grid gap-4">
+                      {result.marketingWeaknesses.length > 0 ? result.marketingWeaknesses.map((weakness, i) => (
+                        <div key={i} className="bg-amber-50 border border-amber-200 p-6 rounded-[2rem] flex items-start gap-4">
+                          <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                          <p className="text-sm text-foreground leading-relaxed">{weakness}</p>
+                        </div>
+                      )) : (
+                        <div className="bg-emerald-50 border border-emerald-200 p-6 rounded-[2rem] flex items-center gap-4">
+                          <CheckCircle className="w-5 h-5 text-emerald-600" />
+                          <p className="text-sm text-foreground">Buenas prácticas de marketing detectadas</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Debilidades UX/UI */}
+                  <div className="space-y-6">
+                    <h4 className="text-[12px] font-bold uppercase tracking-[0.3em] text-purple-600 px-2 flex items-center gap-2">
+                      <Layout className="w-5 h-5" /> Debilidades UX/UI
+                    </h4>
+                    <div className="grid gap-4">
+                      {result.uxWeaknesses.length > 0 ? result.uxWeaknesses.map((weakness, i) => (
+                        <div key={i} className="bg-purple-50 border border-purple-200 p-6 rounded-[2rem] flex items-start gap-4">
+                          <Layout className="w-5 h-5 text-purple-600 mt-0.5 flex-shrink-0" />
+                          <p className="text-sm text-foreground leading-relaxed">{weakness}</p>
+                        </div>
+                      )) : (
+                        <div className="bg-emerald-50 border border-emerald-200 p-6 rounded-[2rem] flex items-center gap-4">
+                          <CheckCircle className="w-5 h-5 text-emerald-600" />
+                          <p className="text-sm text-foreground">Buena experiencia de usuario detectada</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Oportunidades de Mejora */}
+                  <div className="space-y-6">
+                    <h4 className="text-[12px] font-bold uppercase tracking-[0.3em] text-primary px-2 flex items-center gap-2">
+                      <Lightbulb className="w-5 h-5" /> Oportunidades de Mejora
+                    </h4>
+                    <div className="grid gap-4">
+                      {result.improvementOpportunities.map((opportunity, i) => (
+                        <div key={i} className="bg-primary/10 border border-primary/20 p-6 rounded-[2rem] flex items-start gap-4">
+                          <Lightbulb className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                          <p className="text-sm text-foreground leading-relaxed">{opportunity}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Análisis de Contenido */}
+                  <div className="space-y-6">
+                    <h4 className="text-[12px] font-bold uppercase tracking-[0.3em] text-foreground px-2 flex items-center gap-2">
+                      <FileText className="w-5 h-5" /> Análisis de Contenido
+                    </h4>
+                    <div className="p-10 bg-secondary/20 border border-border/40 rounded-[3rem] text-lg text-muted-foreground leading-relaxed shadow-inner">
+                      {result.contentAnalysis}
+                    </div>
+                  </div>
+
+                  {/* Análisis SEO */}
+                  <div className="space-y-6">
+                    <h4 className="text-[12px] font-bold uppercase tracking-[0.3em] text-foreground px-2 flex items-center gap-2">
+                      <Zap className="w-5 h-5" /> Análisis SEO
+                    </h4>
+                    <div className="p-10 bg-secondary/20 border border-border/40 rounded-[3rem] text-lg text-muted-foreground leading-relaxed shadow-inner">
+                      {result.seoAnalysis}
                     </div>
                   </div>
 

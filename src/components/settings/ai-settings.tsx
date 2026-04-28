@@ -98,20 +98,68 @@ export function AISettings() {
                     <SelectItem value="googleai/gemini-2.0-flash-exp" className="h-14 rounded-xl px-4 font-bold text-md">Gemini 2.0 Flash (Experimental)</SelectItem>
                     <SelectItem value="googleai/gemini-1.5-pro" className="h-14 rounded-xl px-4 font-bold text-md">Gemini 1.5 Pro</SelectItem>
                     <SelectItem value="googleai/gemini-1.5-flash" className="h-14 rounded-xl px-4 font-bold text-md">Gemini 1.5 Flash</SelectItem>
+                    <SelectItem value="googleai/gemini-1.0-pro" className="h-14 rounded-xl px-4 font-bold text-md">Gemini 1.0 Pro</SelectItem>
                   </SelectGroup>
                   <SelectGroup>
                     <SelectLabel className="text-[10px] font-bold text-accent uppercase tracking-widest p-4">OpenAI Ecosystem</SelectLabel>
                     <SelectItem value="openai/gpt-4o" className="h-14 rounded-xl px-4 font-bold text-md">GPT-4o (Omni)</SelectItem>
                     <SelectItem value="openai/gpt-4o-mini" className="h-14 rounded-xl px-4 font-bold text-md">GPT-4o Mini</SelectItem>
+                    <SelectItem value="openai/gpt-4-turbo" className="h-14 rounded-xl px-4 font-bold text-md">GPT-4 Turbo</SelectItem>
+                    <SelectItem value="openai/gpt-4" className="h-14 rounded-xl px-4 font-bold text-md">GPT-4</SelectItem>
+                    <SelectItem value="openai/gpt-3.5-turbo" className="h-14 rounded-xl px-4 font-bold text-md">GPT-3.5 Turbo</SelectItem>
                   </SelectGroup>
                   <SelectGroup>
-                    <SelectLabel className="text-[10px] font-bold text-blue-500 uppercase tracking-widest p-4">OpenRouter (Elite Models)</SelectLabel>
+                    <SelectLabel className="text-[10px] font-bold text-purple-500 uppercase tracking-widest p-4">Anthropic Claude</SelectLabel>
                     <SelectItem value="openrouter/anthropic/claude-3.5-sonnet" className="h-14 rounded-xl px-4 font-bold text-md">Claude 3.5 Sonnet</SelectItem>
-                    <SelectItem value="openrouter/meta-llama/llama-3.1-405b-instruct" className="h-14 rounded-xl px-4 font-bold text-md">Llama 3.1 405B (Meta)</SelectItem>
-                    <SelectItem value="openrouter/alibaba/qwen-2.5-72b-instruct" className="h-14 rounded-xl px-4 font-bold text-md">Qwen 2.5 72B (Alibaba)</SelectItem>
+                    <SelectItem value="openrouter/anthropic/claude-3.5-haiku" className="h-14 rounded-xl px-4 font-bold text-md">Claude 3.5 Haiku</SelectItem>
+                    <SelectItem value="openrouter/anthropic/claude-3-opus" className="h-14 rounded-xl px-4 font-bold text-md">Claude 3 Opus</SelectItem>
+                    <SelectItem value="openrouter/anthropic/claude-3-sonnet" className="h-14 rounded-xl px-4 font-bold text-md">Claude 3 Sonnet</SelectItem>
+                    <SelectItem value="openrouter/anthropic/claude-3-haiku" className="h-14 rounded-xl px-4 font-bold text-md">Claude 3 Haiku</SelectItem>
+                  </SelectGroup>
+                  <SelectGroup>
+                    <SelectLabel className="text-[10px] font-bold text-blue-500 uppercase tracking-widest p-4">Meta Llama</SelectLabel>
+                    <SelectItem value="openrouter/meta-llama/llama-3.1-405b-instruct" className="h-14 rounded-xl px-4 font-bold text-md">Llama 3.1 405B</SelectItem>
+                    <SelectItem value="openrouter/meta-llama/llama-3.1-70b-instruct" className="h-14 rounded-xl px-4 font-bold text-md">Llama 3.1 70B</SelectItem>
+                    <SelectItem value="openrouter/meta-llama/llama-3.1-8b-instruct" className="h-14 rounded-xl px-4 font-bold text-md">Llama 3.1 8B</SelectItem>
+                    <SelectItem value="openrouter/meta-llama/llama-3-70b-instruct" className="h-14 rounded-xl px-4 font-bold text-md">Llama 3 70B</SelectItem>
+                  </SelectGroup>
+                  <SelectGroup>
+                    <SelectLabel className="text-[10px] font-bold text-orange-500 uppercase tracking-widest p-4">Alibaba Qwen</SelectLabel>
+                    <SelectItem value="openrouter/alibaba/qwen-2.5-72b-instruct" className="h-14 rounded-xl px-4 font-bold text-md">Qwen 2.5 72B</SelectItem>
+                    <SelectItem value="openrouter/alibaba/qwen-2.5-7b-instruct" className="h-14 rounded-xl px-4 font-bold text-md">Qwen 2.5 7B</SelectItem>
+                    <SelectItem value="openrouter/alibaba/qwen-2-72b-instruct" className="h-14 rounded-xl px-4 font-bold text-md">Qwen 2 72B</SelectItem>
+                  </SelectGroup>
+                  <SelectGroup>
+                    <SelectLabel className="text-[10px] font-bold text-cyan-500 uppercase tracking-widest p-4">DeepSeek</SelectLabel>
                     <SelectItem value="openrouter/deepseek/deepseek-chat" className="h-14 rounded-xl px-4 font-bold text-md">DeepSeek V3</SelectItem>
-                    <SelectItem value="openrouter/x-ai/grok-2" className="h-14 rounded-xl px-4 font-bold text-md">Grok 2 (Beta)</SelectItem>
+                    <SelectItem value="openrouter/deepseek/deepseek-coder" className="h-14 rounded-xl px-4 font-bold text-md">DeepSeek Coder</SelectItem>
+                  </SelectGroup>
+                  <SelectGroup>
+                    <SelectLabel className="text-[10px] font-bold text-gray-700 uppercase tracking-widest p-4">X.ai Grok</SelectLabel>
+                    <SelectItem value="openrouter/x-ai/grok-2" className="h-14 rounded-xl px-4 font-bold text-md">Grok 2</SelectItem>
+                    <SelectItem value="openrouter/x-ai/grok-beta" className="h-14 rounded-xl px-4 font-bold text-md">Grok Beta</SelectItem>
+                  </SelectGroup>
+                  <SelectGroup>
+                    <SelectLabel className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest p-4">Mistral AI</SelectLabel>
                     <SelectItem value="openrouter/mistralai/mistral-large" className="h-14 rounded-xl px-4 font-bold text-md">Mistral Large 2</SelectItem>
+                    <SelectItem value="openrouter/mistralai/mistral-medium" className="h-14 rounded-xl px-4 font-bold text-md">Mistral Medium</SelectItem>
+                    <SelectItem value="openrouter/mistralai/mistral-small" className="h-14 rounded-xl px-4 font-bold text-md">Mistral Small</SelectItem>
+                    <SelectItem value="openrouter/mistralai/codestral" className="h-14 rounded-xl px-4 font-bold text-md">Codestral</SelectItem>
+                  </SelectGroup>
+                  <SelectGroup>
+                    <SelectLabel className="text-[10px] font-bold text-teal-500 uppercase tracking-widest p-4">Cohere</SelectLabel>
+                    <SelectItem value="openrouter/cohere/command-r-plus" className="h-14 rounded-xl px-4 font-bold text-md">Command R+</SelectItem>
+                    <SelectItem value="openrouter/cohere/command-r" className="h-14 rounded-xl px-4 font-bold text-md">Command R</SelectItem>
+                  </SelectGroup>
+                  <SelectGroup>
+                    <SelectLabel className="text-[10px] font-bold text-pink-500 uppercase tracking-widest p-4">Microsoft Phi</SelectLabel>
+                    <SelectItem value="openrouter/microsoft/phi-3-medium-128k-instruct" className="h-14 rounded-xl px-4 font-bold text-md">Phi-3 Medium 128K</SelectItem>
+                    <SelectItem value="openrouter/microsoft/phi-3-mini-128k-instruct" className="h-14 rounded-xl px-4 font-bold text-md">Phi-3 Mini 128K</SelectItem>
+                  </SelectGroup>
+                  <SelectGroup>
+                    <SelectLabel className="text-[10px] font-bold text-yellow-600 uppercase tracking-widest p-4">Perplexity</SelectLabel>
+                    <SelectItem value="openrouter/perplexity/llama-3.1-sonar-huge-128k-online" className="h-14 rounded-xl px-4 font-bold text-md">Sonar Huge 128K Online</SelectItem>
+                    <SelectItem value="openrouter/perplexity/llama-3.1-sonar-small-128k-online" className="h-14 rounded-xl px-4 font-bold text-md">Sonar Small 128K Online</SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>
