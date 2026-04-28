@@ -53,7 +53,7 @@ const extractProfileFlow = ai.defineFlow(
     outputSchema: ExtractProfileOutputSchema,
   },
   async (input) => {
-    const modelId = input.userConfig?.modelId || 'googleai/gemini-2.0-flash-exp';
+    const modelId = input.userConfig?.modelId || 'googleai/gemini-2.0-flash';
     
     const promptText = `You are a Senior Digital Scout and OSINT Analyst. Your mission is to perform a deep tactical analysis of this URL: ${input.url}
 

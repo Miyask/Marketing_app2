@@ -47,7 +47,7 @@ export function AssetGenerator() {
 
   const handleGenerate = async () => {
     const aiSettings = profile?.aiSettings;
-    const modelId = aiSettings?.modelId || 'googleai/gemini-2.0-flash-exp';
+    const modelId = aiSettings?.modelId || 'googleai/gemini-2.0-flash';
     
     let hasKey = false;
     if (modelId.startsWith('googleai/') && (aiSettings?.googleApiKey || hasServerKey)) hasKey = true;
@@ -68,7 +68,7 @@ export function AssetGenerator() {
       const result = await generateMarketingAssets({
         ...formData,
         userConfig: {
-          modelId: aiSettings?.modelId || 'googleai/gemini-2.0-flash-exp',
+          modelId: aiSettings?.modelId || 'googleai/gemini-2.0-flash',
           googleApiKey: aiSettings?.googleApiKey,
           openaiApiKey: aiSettings?.openaiApiKey,
           openrouterApiKey: aiSettings?.openrouterApiKey,

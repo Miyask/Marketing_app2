@@ -34,7 +34,7 @@ export function AISettings() {
   const { data: profile } = useDoc(userRef);
 
   const [settings, setSettings] = useState({
-    modelId: "googleai/gemini-2.0-flash-exp",
+    modelId: "googleai/gemini-2.0-flash",
     googleApiKey: "",
     openaiApiKey: "",
     openrouterApiKey: "",
@@ -43,7 +43,7 @@ export function AISettings() {
   useEffect(() => {
     if (profile?.aiSettings) {
       setSettings({
-        modelId: profile.aiSettings.modelId || "googleai/gemini-2.0-flash-exp",
+        modelId: profile.aiSettings.modelId || "googleai/gemini-2.0-flash",
         googleApiKey: profile.aiSettings.googleApiKey || "",
         openaiApiKey: profile.aiSettings.openaiApiKey || "",
         openrouterApiKey: profile.aiSettings.openrouterApiKey || "",
@@ -222,8 +222,8 @@ export function AISettings() {
                     <SelectLabel className="text-xs font-bold text-primary uppercase tracking-wider px-3 py-2">
                       Google DeepMind
                     </SelectLabel>
-                    <SelectItem value="googleai/gemini-2.0-flash-exp" className="h-11 rounded-lg px-3">
-                      Gemini 2.0 Flash (Experimental)
+                    <SelectItem value="googleai/gemini-2.0-flash" className="h-11 rounded-lg px-3">
+                      Gemini 2.0 Flash
                     </SelectItem>
                     <SelectItem value="googleai/gemini-1.5-pro" className="h-11 rounded-lg px-3">
                       Gemini 1.5 Pro

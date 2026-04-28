@@ -41,7 +41,7 @@ const generateMarketingAssetsFlow = ai.defineFlow(
     outputSchema: GenerateMarketingAssetsOutputSchema,
   },
   async (input) => {
-    const modelId = input.userConfig?.modelId || 'googleai/gemini-2.0-flash-exp';
+    const modelId = input.userConfig?.modelId || 'googleai/gemini-2.0-flash';
     
     const promptText = `You are an expert marketing strategist and creative copywriter. Generate marketing assets for:
 Business: ${input.businessName}

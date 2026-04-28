@@ -16,7 +16,7 @@ if (process.env.GOOGLE_GENAI_API_KEY) {
  */
 export const ai = genkit({
   plugins,
-  model: plugins.length > 0 ? 'googleai/gemini-2.0-flash-exp' : undefined,
+  model: plugins.length > 0 ? 'googleai/gemini-2.0-flash' : undefined,
 });
 
 /**

@@ -44,7 +44,7 @@ const discoverClientsFlow = ai.defineFlow(
     outputSchema: DiscoverClientsOutputSchema,
   },
   async (input) => {
-    const modelId = input.userConfig?.modelId || 'googleai/gemini-2.0-flash-exp';
+    const modelId = input.userConfig?.modelId || 'googleai/gemini-2.0-flash';
     
     const promptText = `You are an expert Sales Intelligence Agent. Your task is to perform a detailed market scan for:
 Sector: ${input.sector}

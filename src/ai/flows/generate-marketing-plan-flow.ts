@@ -58,7 +58,7 @@ const generateMarketingPlanFlow = ai.defineFlow(
     outputSchema: MarketingPlanOutputSchema,
   },
   async (input) => {
-    const modelId = input.userConfig?.modelId || 'googleai/gemini-2.0-flash-exp';
+    const modelId = input.userConfig?.modelId || 'googleai/gemini-2.0-flash';
     
     const promptText = `You are a Senior Marketing Director. Create a high-level strategic marketing plan for:
 

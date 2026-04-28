@@ -42,7 +42,7 @@ export function ClientDiscovery() {
 
   const handleSearch = async () => {
     const aiSettings = profile?.aiSettings;
-    const modelId = aiSettings?.modelId || 'googleai/gemini-2.0-flash-exp';
+    const modelId = aiSettings?.modelId || 'googleai/gemini-2.0-flash';
     
     let hasKey = false;
     if (modelId.startsWith('googleai/') && (aiSettings?.googleApiKey || hasServerKey)) hasKey = true;
@@ -63,7 +63,7 @@ export function ClientDiscovery() {
       const data = await discoverClients({
         ...params,
         userConfig: {
-          modelId: aiSettings?.modelId || 'googleai/gemini-2.0-flash-exp',
+          modelId: aiSettings?.modelId || 'googleai/gemini-2.0-flash',
           googleApiKey: aiSettings?.googleApiKey,
           openaiApiKey: aiSettings?.openaiApiKey,
           openrouterApiKey: aiSettings?.openrouterApiKey,
