@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -16,7 +17,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Target, Sparkles, Rocket, ShieldCheck, UserCircle, ArrowRight, Loader2, ArrowLeft, Lock } from "lucide-react";
+import { Target, Sparkles, UserCircle, ArrowRight, Loader2, ArrowLeft, Lock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function AuthPage() {
@@ -44,7 +45,6 @@ export default function AuthPage() {
     if (!db) return;
     const userRef = doc(db, "users", uid);
     try {
-      // Only set basic profile data; preserve existing aiSettings if any
       await setDoc(userRef, {
         id: uid,
         email: userEmail || "",
@@ -235,18 +235,15 @@ export default function AuthPage() {
       {/* Right Side - Auth Form */}
       <div className="flex items-center justify-center p-6 lg:p-12 relative">
         <div className="w-full max-w-md relative z-10">
-          <div className="bg-white rounded-3xl shadow-2xl border border-border/50 overflow-hidden">
-            {/* Decorative Header */}
-            <div className="h-2 bg-gradient-to-r from-primary via-accent to-primary" />
-            
-            <div className="p-8 lg:p-10">
-              <div className="text-center mb-8">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent mb-4 shadow-lg">
-                  <Target className="w-8 h-8 text-white" />
-                </div>
-                <h2 className="text-2xl font-bold text-foreground mb-2">MarketScout Pro</h2>
-                <p className="text-sm text-muted-foreground">Plataforma de inteligencia de marketing</p>
+          <Card className="bg-white/90 backdrop-blur-xl border-border/50 shadow-2xl rounded-3xl overflow-hidden">
+            <CardHeader className="text-center pb-6">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent mb-4 shadow-lg">
+                <Target className="w-8 h-8 text-white" />
               </div>
+              <CardTitle className="text-2xl font-bold">MarketScout Pro</CardTitle>
+              <CardDescription>Plataforma de inteligencia de marketing</CardDescription>
+            </CardHeader>
+            
             <CardContent className="space-y-6">
               <Button 
                 className="w-full h-16 premium-gradient hover:opacity-90 text-white font-bold text-lg rounded-2xl shadow-xl transition-all flex items-center justify-center gap-3 hover-lift animate-gradient"
@@ -329,6 +326,8 @@ export default function AuthPage() {
                 Continuar con Google
               </Button>
             </CardContent>
+            
+            <CardFooter className="pt-0"></CardFooter>
           </Card>
         </div>
       </div>
