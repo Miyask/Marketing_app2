@@ -2,15 +2,21 @@
 import { genkit } from 'genkit';
 import { googleAI } from '@genkit-ai/google-genai';
 
+const plugins: any[] = [];
+
+// Only initialize Google AI plugin if API key is available (either env or will be provided per-request)
+// The runAIQuery function handles user-provided keys directly via fetch, so this plugin is only needed for ai.defineFlow internal usage.
+if (process.env.GOOGLE_GENAI_API_KEY) {
+  plugins.push(googleAI({ apiKey: process.env.GOOGLE_GENAI_API_KEY }));
+}
+
 /**
- * Global Genkit instance configured with the Google AI plugin.
- * Uses environment variable only - user-provided keys are handled per-request.
+ * Global Genkit instance.
+ * Used for defining flows; actual generation is handled via runAIQuery.
  */
 export const ai = genkit({
-  plugins: [
-    googleAI({ apiKey: process.env.GOOGLE_GENAI_API_KEY })
-  ],
-  model: 'googleai/gemini-2.0-flash-exp',
+  plugins,
+  model: plugins.length > 0 ? 'googleai/gemini-2.0-flash-exp' : undefined,
 });
 
 /**
