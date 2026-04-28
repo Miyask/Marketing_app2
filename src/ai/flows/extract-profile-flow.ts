@@ -163,7 +163,7 @@ const extractProfileFlow = ai.defineFlow(
     outputSchema: ExtractProfileOutputSchema,
   },
   async (input) => {
-    const modelId = input.userConfig?.modelId || 'googleai/gemini-2.0-flash';
+    const modelId = input.userConfig?.modelId || 'googleai/gemini-2.5-flash';
 
     // Actually fetch the webpage content for real analysis
     const webData = await fetchWebpageContent(input.url);
@@ -237,8 +237,22 @@ Return ONLY a JSON object matching this schema:
 
     try {
       const cleanJson = response!.replace(/```json|```/g, '').trim();
-      return JSON.parse(cleanJson) as ExtractProfileOutput;
+      const parsed = JSON.parse(cleanJson);
+      const arrayFields = ['socialLinks', 'competitors', 'strengths', 'technicalWeaknesses', 'marketingWeaknesses', 'uxWeaknesses', 'improvementOpportunities'];
+      for (const field of arrayFields) {
+        if (parsed[field] && !Array.isArray(parsed[field])) {
+          parsed[field] = parsed[field] === 'No encontrado en la web' ? [] : [parsed[field]];
+        }
+        if (!parsed[field]) {
+          parsed[field] = [];
+        }
+      }
+      if (typeof parsed.overallScore !== 'number') {
+        parsed.overallScore = parseInt(parsed.overallScore) || 5;
+      }
+      return parsed as ExtractProfileOutput;
     } catch (e) {
+      console.error('Failed to parse AI response:', response?.substring(0, 500));
       throw new Error('Failed to extract profile data due to invalid AI response.');
     }
   }

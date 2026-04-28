@@ -16,7 +16,7 @@ if (process.env.GOOGLE_GENAI_API_KEY) {
  */
 export const ai = genkit({
   plugins,
-  model: plugins.length > 0 ? 'googleai/gemini-2.0-flash' : undefined,
+  model: plugins.length > 0 ? 'googleai/gemini-2.5-flash' : undefined,
 });
 
 /**
@@ -94,7 +94,9 @@ export async function runAIQuery(params: {
           }
           throw new Error(`Google AI Error: ${data.error?.message || JSON.stringify(data)}`);
         }
-        return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        const parts = data.candidates?.[0]?.content?.parts || [];
+        const textPart = parts.filter((p: any) => p.text !== undefined).pop();
+        return textPart?.text || '';
       } catch (error) {
         if (attempt === maxRetries || !(error instanceof Error) || !error.message.includes('429')) {
           console.error('Google AI Error:', error);

@@ -43,7 +43,7 @@ export function PlanGenerator() {
 
   const handleGenerate = async () => {
     const aiSettings = profile?.aiSettings;
-    const modelId = aiSettings?.modelId || 'googleai/gemini-2.0-flash';
+    const modelId = aiSettings?.modelId || 'googleai/gemini-2.5-flash';
     
     let hasKey = false;
     if (modelId.startsWith('googleai/') && (aiSettings?.googleApiKey || hasServerKey)) hasKey = true;
@@ -64,7 +64,7 @@ export function PlanGenerator() {
       const result = await generateMarketingPlan({
         ...formData,
         userConfig: {
-          modelId: aiSettings?.modelId || 'googleai/gemini-2.0-flash',
+          modelId: aiSettings?.modelId || 'googleai/gemini-2.5-flash',
           googleApiKey: aiSettings?.googleApiKey,
           openaiApiKey: aiSettings?.openaiApiKey,
           openrouterApiKey: aiSettings?.openrouterApiKey,

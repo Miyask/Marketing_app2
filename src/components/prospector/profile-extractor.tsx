@@ -54,7 +54,7 @@ export function ProfileExtractor() {
       const data = await extractProfile({
         url,
         userConfig: {
-          modelId: aiSettings?.modelId || 'googleai/gemini-2.0-flash',
+          modelId: aiSettings?.modelId || 'googleai/gemini-2.5-flash',
           googleApiKey: aiSettings?.googleApiKey,
           openaiApiKey: aiSettings?.openaiApiKey,
           openrouterApiKey: aiSettings?.openrouterApiKey,

@@ -41,7 +41,7 @@ const generateMarketingAssetsFlow = ai.defineFlow(
     outputSchema: GenerateMarketingAssetsOutputSchema,
   },
   async (input) => {
-    const modelId = input.userConfig?.modelId || 'googleai/gemini-2.0-flash';
+    const modelId = input.userConfig?.modelId || 'googleai/gemini-2.5-flash';
     
     const promptText = `You are an expert marketing strategist and creative copywriter. Generate marketing assets for:
 Business: ${input.businessName}
@@ -69,8 +69,12 @@ Return ONLY a JSON object matching this schema:
 
     try {
       const cleanJson = response!.replace(/```json|```/g, '').trim();
-      return JSON.parse(cleanJson) as GenerateMarketingAssetsOutput;
+      const parsed = JSON.parse(cleanJson);
+      if (!Array.isArray(parsed.marketingIdeas)) parsed.marketingIdeas = parsed.marketingIdeas ? [parsed.marketingIdeas] : [];
+      if (!Array.isArray(parsed.slogans)) parsed.slogans = parsed.slogans ? [parsed.slogans] : [];
+      return parsed as GenerateMarketingAssetsOutput;
     } catch (e) {
+      console.error('Failed to parse AI response:', response?.substring(0, 500));
       throw new Error('Failed to generate assets due to invalid AI response.');
     }
   }

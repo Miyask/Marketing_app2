@@ -44,7 +44,7 @@ const discoverClientsFlow = ai.defineFlow(
     outputSchema: DiscoverClientsOutputSchema,
   },
   async (input) => {
-    const modelId = input.userConfig?.modelId || 'googleai/gemini-2.0-flash';
+    const modelId = input.userConfig?.modelId || 'googleai/gemini-2.5-flash';
     
     const promptText = `You are an expert Sales Intelligence Agent. Your task is to perform a detailed market scan for:
 Sector: ${input.sector}
@@ -80,8 +80,18 @@ Return ONLY a JSON object matching this schema:
 
     try {
       const cleanJson = response!.replace(/```json|```/g, '').trim();
-      return JSON.parse(cleanJson) as DiscoverClientsOutput;
+      const parsed = JSON.parse(cleanJson);
+      if (!Array.isArray(parsed.leads)) {
+        parsed.leads = [];
+      }
+      for (const lead of parsed.leads) {
+        if (typeof lead.rating !== 'number') {
+          lead.rating = parseInt(lead.rating) || 3;
+        }
+      }
+      return parsed as DiscoverClientsOutput;
     } catch (e) {
+      console.error('Failed to parse AI response:', response?.substring(0, 500));
       throw new Error('Failed to discover clients due to invalid AI response.');
     }
   }
